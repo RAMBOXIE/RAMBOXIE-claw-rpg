@@ -1,61 +1,64 @@
-# 转职系统 (Prestige)
+# Prestige System
 
-达到 Lv.999 后可执行转职，进入下一轮成长循环。
+Reach Lv.999 to trigger prestige and enter the next growth cycle.
 
-## 执行转职
+## How to Prestige
 
 ```bash
 node scripts/levelup.mjs --prestige
 ```
 
-## 转职效果
+## Effects
 
-| 效果 | 说明 |
-|------|------|
-| 等级重置 | Level 归 1，重新开始 |
-| 全属性 +10% | 永久加成，叠加计算 |
-| XP 需求提升 | 升级 XP 需求 × 1.5 倍（每次转职） |
-| 解锁新称号 | 见下方称号表 |
+| Effect | Details |
+|--------|---------|
+| Level reset | Returns to Lv.1 — the grind starts over |
+| All stats +10% | Permanent bonus, stacks across prestiges |
+| XP requirement ×1.5 | Each prestige raises the XP curve |
+| New title unlocked | See title table below |
 
-## 称号体系
+## Title Tiers
 
-| 转职次数 | 称号 | 等级要求 |
-|---------|------|---------|
-| 0 | 小龙虾 | L1-999 |
-| 1 | 龙虾战士 | L1-999 |
-| 2 | 龙虾武士 | L1-999 |
-| 3 | 龙虾将领 | L1-999 |
-| 4 | 龙虾将军 | L1-999 |
-| 5 | 传说龙虾 | L1-999 |
-| 6 | 神话龙虾 | L1-999 |
-| 7 | 史诗龙虾 | L1-999 |
-| 8 | 上古龙虾 | L1-999 |
-| 9 | 永恒龙虾 | L1-999 |
-| 10+ | 混沌龙虾 | L1-999 |
+| Prestige | Title | Level Range |
+|----------|-------|-------------|
+| 0 | Little Lobster | Lv.1–999 |
+| 1 | Lobster Warrior | Lv.1–999 |
+| 2 | Lobster Knight | Lv.1–999 |
+| 3 | Lobster Commander | Lv.1–999 |
+| 4 | Lobster General | Lv.1–999 |
+| 5 | Legendary Lobster | Lv.1–999 |
+| 6 | Mythic Lobster | Lv.1–999 |
+| 7 | Epic Lobster | Lv.1–999 |
+| 8 | Ancient Lobster | Lv.1–999 |
+| 9 | Eternal Lobster | Lv.1–999 |
+| 10+ | Chaos Lobster | Lv.1–999 |
 
-## 属性上限
+## Stat Cap After Prestige
 
-属性值无上限（转职每次 +10%），但 UI 显示时以满格 20 为基准，超出部分以溢出特效展示。
+Stats have no hard cap after prestige — each prestige adds a permanent +10% multiplier. The dashboard displays stats with a baseline of 20; overflow is rendered as a bonus indicator.
 
-## 转职后 XP 需求
+## XP Scaling
 
 ```
-第 1 次转职：原 XP 需求 × 1.5
-第 2 次转职：原 XP 需求 × 2.25（1.5²）
-第 n 次转职：原 XP 需求 × 1.5ⁿ
+Prestige 1: base XP × 1.5
+Prestige 2: base XP × 2.25  (1.5²)
+Prestige n: base XP × 1.5ⁿ
 ```
 
-意味着越到后期越难，真正的长期成长系统。
+The later you get, the harder the grind — a true long-term growth system.
 
-## 职业是否重置？
+## Does Class Reset?
 
-**不重置**。职业依然由属性决定，转职后属性全部提升，职业保持不变（除非属性平衡后触发职业重判）。
+**No.** Class is always derived from current stats. After prestige, all stats increase proportionally, so the class usually stays the same — unless the boost tips the balance, triggering a re-evaluation.
 
-## 龙虾竞技场排名
+## Arena Rank by Prestige
 
-转职次数作为竞技场的「段位」参考：
-- 0 转职：青铜龙虾
-- 1-3 转职：白银龙虾
-- 4-6 转职：黄金龙虾
-- 7-9 转职：钻石龙虾
-- 10+ 转职：混沌龙虾（最高段位）
+Prestige count serves as the arena "division":
+
+| Prestige | Arena Rank |
+|----------|-----------|
+| 0 | Bronze Lobster |
+| 1–3 | Silver Lobster |
+| 4–6 | Gold Lobster |
+| 7–9 | Diamond Lobster |
+| 10+ | Chaos Lobster (highest) |

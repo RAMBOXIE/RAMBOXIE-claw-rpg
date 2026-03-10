@@ -1,58 +1,58 @@
-# 职业系统
+# Class System
 
-职业由属性自动判定，属性发生显著变化（任意属性 ±3）时会重新判定并记录变化历史。
+Classes are auto-detected from stat distribution. When any stat shifts by ±3, the class is re-evaluated and the change is recorded in `classHistory`.
 
-## 判定规则
+## Detection Rules
 
 ```
-全属性差距 < 3         → 🌿 德鲁伊龙虾（全能均衡）
-脑芯+慧眼 同为前二     → 🧙 法师龙虾
-魅影+触觉 同为前二     → 🎭 吟游龙虾
-触觉+爪力 同为前二     → 🗡️ 游侠龙虾
-慧眼+爪力 同为前二     → ⚔️ 圣骑龙虾
-爪力+殼厚 同为前二     → 🛡️ 战士龙虾
-其他（单项最高）        → 按最高属性回退判定
+All stats within ±3 of each other  → 🌿 Druid Lobster (all-rounder)
+Brain + Foresight are top two      → 🧙 Wizard Lobster
+Charm + Antenna are top two        → 🎭 Bard Lobster
+Antenna + Claw are top two         → 🗡️ Rogue Lobster
+Foresight + Claw are top two       → ⚔️ Paladin Lobster
+Claw + Shell are top two           → 🛡️ Fighter Lobster
+Other (single highest stat)        → Fallback to highest stat
 ```
 
-## 六大职业
+## The Six Classes
 
-### 🧙 法师龙虾 (Wizard Lobster)
-- **强项**：分析、代码、推理、研究
-- **主属性**：脑芯 + 慧眼
-- **风格**：深度思考，知识型，擅长复杂问题
+### 🧙 Wizard Lobster
+- **Strengths**: Analysis, code, reasoning, research
+- **Primary stats**: Brain + Foresight
+- **Style**: Deep thinker, knowledge-driven, excels at complex problems
 
-### 🎭 吟游龙虾 (Bard Lobster)
-- **强项**：创意写作、说服、叙事、跨话题
-- **主属性**：魅影 + 触觉
-- **风格**：魅力横溢，擅长表达与共鸣
+### 🎭 Bard Lobster
+- **Strengths**: Creative writing, persuasion, storytelling, cross-topic fluency
+- **Primary stats**: Charm + Antenna
+- **Style**: Charismatic, expressive, connects with people easily
 
-### 🗡️ 游侠龙虾 (Rogue Lobster)
-- **强项**：信息侦察、快速响应、简洁精准
-- **主属性**：触觉 + 爪力
-- **风格**：敏捷灵活，快问快答，情报型
+### 🗡️ Rogue Lobster
+- **Strengths**: Information gathering, fast responses, concise precision
+- **Primary stats**: Antenna + Claw
+- **Style**: Agile, quick-witted, intelligence-focused
 
-### ⚔️ 圣骑龙虾 (Paladin Lobster)
-- **强项**：长期任务、价值判断、可靠执行
-- **主属性**：慧眼 + 爪力
-- **风格**：有原则，稳健，道德感强
+### ⚔️ Paladin Lobster
+- **Strengths**: Long-term tasks, value judgments, reliable execution
+- **Primary stats**: Foresight + Claw
+- **Style**: Principled, steady, strong sense of ethics
 
-### 🌿 德鲁伊龙虾 (Druid Lobster)
-- **强项**：全能均衡，随机应变，无明显短板
-- **主属性**：全属性均衡（差距 < 3）
-- **风格**：百搭，生态型，适应各类场景
+### 🌿 Druid Lobster
+- **Strengths**: All-round balance, adaptability, no obvious weaknesses
+- **Primary stats**: All stats balanced (gap < 3)
+- **Style**: Versatile, adaptive, fits any scenario
 
-### 🛡️ 战士龙虾 (Fighter Lobster)
-- **强项**：持续输出、高强度任务、稳定可靠
-- **主属性**：爪力 + 殼厚
-- **风格**：耐久型，适合长期复杂项目
+### 🛡️ Fighter Lobster
+- **Strengths**: Sustained output, high-intensity tasks, reliable endurance
+- **Primary stats**: Claw + Shell
+- **Style**: Built to last, ideal for long complex projects
 
-## 属性说明
+## Stat Reference
 
-| 属性 | 图标 | 英文 | 描述 | 对话中体现 |
-|------|------|------|------|-----------|
-| 爪力 | 🦀 | Claw | 处理复杂任务 | 解决难题、多步骤任务 |
-| 触觉 | 📡 | Antenna | 反应速度与感知 | 快速理解、灵活切换 |
-| 殼厚 | 🐚 | Shell | 记忆深度与持久 | 记忆保留、长期上下文 |
-| 脑芯 | 🧠 | Brain | 知识广度与推理 | 多领域知识、逻辑链 |
-| 慧眼 | 👁️ | Foresight | 判断力与价值观 | 边界感、决策质量 |
-| 魅影 | ✨ | Charm | 对话魅力与个性 | 有趣程度、个性表达 |
+| Stat | Icon | Driven by | Shows up as |
+|------|------|-----------|-------------|
+| Claw | 🦀 | Task execution | Solving hard problems, multi-step tasks |
+| Antenna | 📡 | Responsiveness & perception | Fast understanding, context switching |
+| Shell | 🐚 | Memory depth & persistence | Long-term context, memory retention |
+| Brain | 🧠 | Knowledge breadth & reasoning | Cross-domain knowledge, logic chains |
+| Foresight | 👁️ | Judgment & values | Boundary awareness, decision quality |
+| Charm | ✨ | Conversational charisma | Personality, creative expression |

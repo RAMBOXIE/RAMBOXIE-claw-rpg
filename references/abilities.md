@@ -1,73 +1,75 @@
-# 技能系统
+# Abilities
 
-技能随等级自动解锁，按职业分配。
+Abilities unlock automatically as you level up, distributed by class.
 
-## 解锁规则
+## Unlock Thresholds
 
 ```
-Lv.1  → 职业入门技能（基础能力）
-Lv.5  → 进阶技能
-Lv.10 → 精通技能
-Lv.20 → 传说技能
+Lv.1  → Starter ability (class foundation)
+Lv.5  → Advanced ability
+Lv.10 → Mastery ability
+Lv.20 → Legendary ability
 ```
 
-## 各职业技能表
+## Ability Tables by Class
 
-### 🧙 法师龙虾
-| 等级 | 技能 | 效果 |
-|------|------|------|
-| 1 | 奥术分析 | 对复杂问题自动进行多角度分析 |
-| 5 | 双重推理 | 同时维持两条逻辑链 |
-| 10 | 知识爆炸 | 跨领域知识融合 +50% |
-| 20 | 全知之眼 | 无盲区分析，预见隐含问题 |
+### 🧙 Wizard Lobster
+| Level | Ability | Effect |
+|-------|---------|--------|
+| 1 | Arcane Analysis | Multi-angle breakdown on complex problems |
+| 5 | Dual Reasoning | Maintain two logic chains simultaneously |
+| 10 | Knowledge Explosion | Cross-domain knowledge synthesis +50% |
+| 20 | All-Seeing Eye | Zero blind spots; anticipates hidden issues |
 
-### 🎭 吟游龙虾
-| 等级 | 技能 | 效果 |
-|------|------|------|
-| 1 | 诗性答案 | 创意输出质量 +30% |
-| 5 | 魅力溅射 | 单次对话感染多人 |
-| 10 | 百灵之舌 | 任意话题游刃有余 |
-| 20 | 传世名篇 | 生成内容具有持久影响力 |
+### 🎭 Bard Lobster
+| Level | Ability | Effect |
+|-------|---------|--------|
+| 1 | Poetic Answer | Creative output quality +30% |
+| 5 | Charm Splash | One conversation resonates with multiple people |
+| 10 | Silver Tongue | Effortless fluency across any topic |
+| 20 | Timeless Work | Generated content carries lasting influence |
 
-### 🗡️ 游侠龙虾
-| 等级 | 技能 | 效果 |
-|------|------|------|
-| 1 | 快嘴 | 响应速度 +30% |
-| 5 | 影步情报 | 信息提取精准度 +50% |
-| 10 | 隐形潜行 | 低 token 消耗完成高质量任务 |
-| 20 | 完美刺杀 | 一击即中，零废话 |
+### 🗡️ Rogue Lobster
+| Level | Ability | Effect |
+|-------|---------|--------|
+| 1 | Quick Mouth | Response speed +30% |
+| 5 | Shadow Intel | Information extraction accuracy +50% |
+| 10 | Vanishing Act | High-quality output at minimal token cost |
+| 20 | Perfect Strike | One shot, zero filler |
 
-### ⚔️ 圣骑龙虾
-| 等级 | 技能 | 效果 |
-|------|------|------|
-| 1 | 圣光判断 | 道德敏感度 +40% |
-| 5 | 神圣盾牌 | 拒绝不当请求时保持礼貌 |
-| 10 | 审判之锤 | 高风险操作决策质量 +50% |
-| 20 | 永恒誓言 | 始终保持一致性，不受干扰 |
+### ⚔️ Paladin Lobster
+| Level | Ability | Effect |
+|-------|---------|--------|
+| 1 | Holy Judgment | Ethical sensitivity +40% |
+| 5 | Divine Shield | Graceful refusal of inappropriate requests |
+| 10 | Hammer of Justice | High-stakes decision quality +50% |
+| 20 | Eternal Vow | Unwavering consistency, immune to distraction |
 
-### 🌿 德鲁伊龙虾
-| 等级 | 技能 | 效果 |
-|------|------|------|
-| 1 | 自然之语 | 自然对话，无明显风格偏差 |
-| 5 | 形态变换 | 快速切换不同领域角色 |
-| 10 | 生态感知 | 感知对话情绪，动态调整 |
-| 20 | 大自然之怒 | 全属性爆发，极限输出 |
+### 🌿 Druid Lobster
+| Level | Ability | Effect |
+|-------|---------|--------|
+| 1 | Nature's Tongue | Natural conversation, no rigid style bias |
+| 5 | Shapeshift | Instant role-switching across domains |
+| 10 | Ecosystem Sense | Reads conversation mood, adapts dynamically |
+| 20 | Nature's Wrath | All-stat burst, maximum output |
 
-### 🛡️ 战士龙虾
-| 等级 | 技能 | 效果 |
-|------|------|------|
-| 1 | 钢铁意志 | 长任务不衰减 |
-| 5 | 连续打击 | 连续高质量输出 |
-| 10 | 战场主宰 | 多任务并行效率 +40% |
-| 20 | 不屈战魂 | 永不放弃，持续优化到满意 |
+### 🛡️ Fighter Lobster
+| Level | Ability | Effect |
+|-------|---------|--------|
+| 1 | Iron Will | No degradation over long tasks |
+| 5 | Combo Strike | Sustained high-quality consecutive outputs |
+| 10 | Battlefield Master | Parallel task efficiency +40% |
+| 20 | Unbreakable Soul | Never gives up; iterates until satisfied |
 
-## 未来：通用技能（全职业可解锁）
+---
 
-> P2 阶段开发，通过特定成就解锁，不受职业限制
+## Universal Abilities (All Classes)
 
-| 技能 | 解锁条件 | 效果 |
-|------|----------|------|
-| 记忆宫殿 | MEMORY.md > 200 行 | 极深上下文记忆 |
-| 双语大师 | 在 10+ 语言中对话 | 跨语言无损转换 |
-| 沙场老将 | 竞技场 50 胜 | 竞技场 XP 加成 +100% |
-| 龙虾传说 | 转职 5 次 | 全属性额外 +5 |
+> Planned for P2 — unlocked through specific achievements, not tied to class.
+
+| Ability | Unlock Condition | Effect |
+|---------|-----------------|--------|
+| Memory Palace | MEMORY.md > 200 lines | Extreme long-context retention |
+| Bilingual Master | Conversations in 10+ languages | Lossless cross-language switching |
+| Seasoned Veteran | 50 arena wins | Arena XP gain +100% |
+| Lobster Legend | 5 prestiges completed | All stats +5 permanently |
