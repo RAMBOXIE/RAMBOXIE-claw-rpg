@@ -125,6 +125,9 @@ async function run() {
 
   // 初始化完成后立刻自报家门（首次亮相，--recalc 不触发）
   if (!recalc) {
+    // 标记今日已问候，防止 greet.mjs 重复触发
+    character.lastGreetDate = new Date().toISOString().slice(0, 10);
+    writeFileSync(CHARACTER_FILE, JSON.stringify(character, null, 2), 'utf8');
     console.log('\n── 首次亮相 ──');
     const { buildGreeting } = await import(`${SCRIPTS_URL}greet.mjs`);
     console.log(buildGreeting(character));
