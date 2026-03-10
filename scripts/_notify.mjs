@@ -126,7 +126,7 @@ const QUIPS = {
   },
 };
 
-function detectLang() {
+export function detectLang() {
   try {
     const ws = join(process.env.USERPROFILE || process.env.HOME || '', '.openclaw', 'workspace');
     const files = ['MEMORY.md', 'IDENTITY.md', 'USER.md', 'SOUL.md'];

@@ -20,6 +20,23 @@ node scripts/sheet.mjs
 cd dashboard && npm start     # http://localhost:3500
 ```
 
+## 每日自报家门
+
+每天用户第一次对话时，龙虾用 RPG 语气自我介绍。自动检测语言（中/英），自动只报一次。
+
+```bash
+node scripts/greet.mjs           # 检查今日是否已报，未报则发送
+node scripts/greet.mjs --force   # 强制发送（忽略日期）
+node scripts/greet.mjs --preview # 预览不发送
+```
+
+**接入方式**（在 OpenClaw 的 SOUL.md 或 AGENTS.md 里加入）：
+
+```
+每次对话开始前，运行 node <SKILL_ROOT>/scripts/greet.mjs
+如有输出（非 __ALREADY_GREETED__），将其作为第一句话发给用户
+```
+
 ## 手动同步 XP
 
 ```bash
