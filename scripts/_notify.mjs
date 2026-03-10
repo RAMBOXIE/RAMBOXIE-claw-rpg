@@ -52,7 +52,7 @@ export async function notify(text) {
       },
       body: JSON.stringify({
         tool: 'message',
-        input: { action: 'send', target: chatId, message: text },
+        args: { action: 'send', channel: 'telegram', target: chatId, message: text },
       }),
     });
     return res.ok;
