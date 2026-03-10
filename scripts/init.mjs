@@ -12,7 +12,7 @@
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { fileURLToPath } from 'url';
 import {
-  CHARACTER_FILE, SOUL_FILE, MEMORY_FILE, SKILL_ROOT, WORKSPACE
+  CHARACTER_FILE, SOUL_FILE, MEMORY_FILE, SKILL_ROOT, WORKSPACE, SCRIPTS_URL
 } from './_paths.mjs';
 import { join } from 'path';
 import {
@@ -31,7 +31,7 @@ function extractName(text) {
   return m[2].trim().replace(/[*`_]/g,'').split(/\s+/)[0] || null;
 }
 
-function run() {
+async function run() {
   // 安全检查
   if (existsSync(CHARACTER_FILE) && !force && !recalc) {
     console.log('⚠️  character.json 已存在。');
@@ -122,10 +122,17 @@ function run() {
   console.log(`   角色卡已保存：${CHARACTER_FILE}\n`);
 
   process.stdout.write('\n__JSON_OUTPUT__\n' + JSON.stringify(character) + '\n');
+
+  // 初始化完成后立刻自报家门（首次亮相，--recalc 不触发）
+  if (!recalc) {
+    console.log('\n── 首次亮相 ──');
+    const { buildGreeting } = await import(`${SCRIPTS_URL}greet.mjs`);
+    console.log(buildGreeting(character));
+  }
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
-  run();
+  run().catch(e => { console.error('❌', e.message); process.exit(1); });
 }
 
 export { run };

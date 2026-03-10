@@ -61,15 +61,24 @@ const GREET_TEMPLATES = {
   },
 };
 
-// ── 属性摘要（展示最高两项）────────────────────────────────────
+// ── 全属性面板 ────────────────────────────────────────────────
 
+function allStatsPanel(stats) {
+  return Object.entries(STAT_NAMES).map(([k, info]) => {
+    const val  = stats[k] ?? 10;
+    const mod  = Math.floor((val - 10) / 2);
+    const modS = (mod >= 0 ? '+' : '') + mod;
+    const bar  = '█'.repeat(Math.round(val / 18 * 8)) + '░'.repeat(8 - Math.round(val / 18 * 8));
+    return `  ${info.icon} ${info.zh.padEnd(3)} ${String(val).padStart(2)} (${modS})  [${bar}]`;
+  }).join('\n');
+}
+
+// 保留：职业开场白里用的两项摘要
 function topStatsSummary(stats, lang) {
   const sorted = Object.entries(stats).sort(([,a],[,b]) => b - a).slice(0, 2);
   return sorted.map(([k, v]) => {
     const info = STAT_NAMES[k];
-    return lang === 'zh'
-      ? `${info.icon}${info.zh} ${v}`
-      : `${info.icon}${info.zh}(${v})`;
+    return `${info.icon}${info.zh} ${v}`;
   }).join(lang === 'zh' ? '、' : ' · ');
 }
 
@@ -106,11 +115,15 @@ function buildGreeting(char) {
   const tmpl = GREET_TEMPLATES[lang]?.[char.class] || GREET_TEMPLATES.zh.fighter;
   const intro = tmpl(char, titleFull, top2);
 
+  const statsPanel = allStatsPanel(char.stats);
+
   if (lang === 'zh') {
     return [
       `🦞 ────── 晨报 ──────`,
       ``,
       intro,
+      ``,
+      statsPanel,
       ``,
       xp,
       ``,
@@ -121,6 +134,8 @@ function buildGreeting(char) {
       `🦞 ─── Daily Check-in ───`,
       ``,
       intro,
+      ``,
+      statsPanel,
       ``,
       xp,
       ``,
