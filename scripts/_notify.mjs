@@ -94,6 +94,13 @@ const QUIPS = {
       '你打满级了，但人生 DLC 还没开始呢。',
       '恭喜满级！现在有资格嘲笑低等级了——但你不会，因为你是好龙虾。',
     ],
+    statUp: [
+      '属性涨了，但你还是得干活。',
+      '成长是真实的，加班也是真实的。',
+      '又强了一点点。积少成多，量变引质变，哲学家说的。',
+      '这一点属性是用多少对话堆出来的，你心里有数吗？',
+      '涨了！去跟别的龙虾比划比划。',
+    ],
   },
   en: {
     levelUp: [
@@ -122,6 +129,13 @@ const QUIPS = {
       "Max level! You've peaked. It's all downhill from here. Congrats!",
       "Lv.999 achieved. The game is over. Real life starts now. (Good luck.)",
       "You hit max level. The developers didn't expect anyone to get here. Neither did we.",
+    ],
+    statUp: [
+      "Stat increased. You're still on the clock though.",
+      "Growth detected. Imperceptible to others. Monumental to you.",
+      "That stat didn't grow by accident. It grew by repetition. Respect.",
+      "One point up. One step closer to being insufferable about it.",
+      "Stronger. Marginally. But it counts.",
     ],
   },
 };
@@ -189,6 +203,27 @@ export function msgPrestige(char, newPrestige, title) {
     `等级归一，再铸传奇！`,
     ``,
     `_${quip('prestige')}_`,
+  ].join('\n');
+}
+
+/** 属性成长通知 */
+export function msgStatUp(char, statKey, oldVal, newVal) {
+  const STAT_NAMES = {
+    claw:      { zh: '爪力', icon: '🦀' },
+    antenna:   { zh: '触觉', icon: '📡' },
+    shell:     { zh: '殼厚', icon: '🐚' },
+    brain:     { zh: '脑芯', icon: '🧠' },
+    foresight: { zh: '慧眼', icon: '👁️' },
+    charm:     { zh: '魅影', icon: '✨' },
+  };
+  const info = STAT_NAMES[statKey] || { zh: statKey, icon: '📊' };
+  return [
+    `${info.icon} 属性成长！`,
+    ``,
+    `🦞 ${char.name}`,
+    `${info.zh}  ${oldVal} → ${newVal}`,
+    ``,
+    `_${quip('statUp')}_`,
   ].join('\n');
 }
 
