@@ -1,0 +1,7 @@
+character.json
+arena-history.json
+config.json
+node_modules/
+dashboard/node_modules/
+dashboard/dist/
+*.skill
