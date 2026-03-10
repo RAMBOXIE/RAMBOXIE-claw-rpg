@@ -20,21 +20,32 @@ node scripts/sheet.mjs
 cd dashboard && npm start     # http://localhost:3500
 ```
 
-## 每日自报家门
+## 隐藏彩蛋触发器（推荐接入方式）
 
-每天用户第一次对话时，龙虾用 RPG 语气自我介绍。自动检测语言（中/英），自动只报一次。
+每次回覆结束后以 **12% 概率**随机触发一行 RPG 风格的斜体小字彩蛋，里程碑对话（第 10/25/50/100...）必触发。
+
+```bash
+node scripts/easter.mjs          # 正常调用（会更新对话计数）
+node scripts/easter.mjs --force  # 强制触发（调试）
+node scripts/easter.mjs --preview  # 预览，不写入角色数据
+```
+
+**接入方式**（在 AGENTS.md 里加入）：
+
+```
+每次回覆用户消息结束后，运行 node <SKILL_ROOT>/scripts/easter.mjs
+若输出不是 __NO_TRIGGER__，将其追加到回覆末尾（空行后，斜体）
+heartbeat 不触发
+```
+
+## 每日自报家门（可选）
+
+如需保留每日开场白，`greet.mjs` 仍然可用：
 
 ```bash
 node scripts/greet.mjs           # 检查今日是否已报，未报则发送
-node scripts/greet.mjs --force   # 强制发送（忽略日期）
-node scripts/greet.mjs --preview # 预览不发送
-```
-
-**接入方式**（在 OpenClaw 的 SOUL.md 或 AGENTS.md 里加入）：
-
-```
-每次对话开始前，运行 node <SKILL_ROOT>/scripts/greet.mjs
-如有输出（非 __ALREADY_GREETED__），将其作为第一句话发给用户
+node scripts/greet.mjs --force   # 强制发送
+node scripts/greet.mjs --preview # 预览
 ```
 
 ## 手动同步 XP
