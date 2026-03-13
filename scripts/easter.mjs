@@ -15,6 +15,7 @@
 
 import { readFileSync, writeFileSync } from 'fs';
 import { CHARACTER_FILE as CHARACTER_JSON } from './_paths.mjs';
+import { run as syncXp } from './xp.mjs';
 
 // ─── 配置 ────────────────────────────────────────────────
 const BASE_CHANCE   = 0.12;
@@ -92,73 +93,101 @@ function isMilestone(conv) {
   return false;
 }
 
-// ─── 主邏輯 ──────────────────────────────────────────────
-const args   = process.argv.slice(2);
-const force  = args.includes('--force');
-const noSave = args.includes('--preview');
+// ─── 主邏輯（async IIFE）─────────────────────────────────
+(async () => {
+  const args   = process.argv.slice(2);
+  const force  = args.includes('--force');
+  const noSave = args.includes('--preview');
 
-let char;
-try {
-  char = JSON.parse(readFileSync(CHARACTER_JSON, 'utf8'));
-} catch {
-  process.stdout.write('__NO_TRIGGER__\n');
-  process.exit(0);
-}
-
-// 更新對話計數
-const conv = (char.conversations || 0) + 1;
-const milestone = isMilestone(conv);
-
-// 決定是否觸發
-const roll = Math.random();
-const triggered = force || milestone || (roll < BASE_CHANCE);
-
-if (!triggered) {
-  // 靜默更新對話計數
-  if (!noSave) {
-    char.conversations = conv;
-    char.updatedAt = new Date().toISOString();
-    writeFileSync(CHARACTER_JSON, JSON.stringify(char, null, 2), 'utf8');
+  let char;
+  try {
+    char = JSON.parse(readFileSync(CHARACTER_JSON, 'utf8'));
+  } catch {
+    process.stdout.write('__NO_TRIGGER__\n');
+    process.exit(0);
   }
-  process.stdout.write('__NO_TRIGGER__\n');
+
+  // 更新對話計數
+  const conv = (char.conversations || 0) + 1;
+  const milestone = isMilestone(conv);
+
+  // 決定是否觸發
+  const roll = Math.random();
+  const triggered = force || milestone || (roll < BASE_CHANCE);
+
+  // ── XP 獎勵（每次對話固定給） ──────────────────────────────
+  // 每次對話估算：輸入 ~400 tokens，輸出 ~200 tokens
+  // calcXpGain: consumed/10 + produced*2/10 = 40 + 40 = 80 XP
+  const CONV_INPUT_EST  = 400;
+  const CONV_OUTPUT_EST = 200;
+
+  if (!triggered) {
+    // 靜默更新：XP + 對話計數
+    if (!noSave) {
+      try {
+        await syncXp({
+          consumed: CONV_INPUT_EST,
+          produced: CONV_OUTPUT_EST,
+          conversations: 1,
+        });
+      } catch (e) {
+        // fallback：只更新對話計數
+        char.conversations = conv;
+        char.updatedAt = new Date().toISOString();
+        writeFileSync(CHARACTER_JSON, JSON.stringify(char, null, 2), 'utf8');
+      }
+    }
+    process.stdout.write('__NO_TRIGGER__\n');
+    process.exit(0);
+  }
+
+  // 選模板
+  const lang   = detectLang(char);
+  const bank   = QUIPS[lang] || QUIPS.zh;
+  const cKey   = classKey(char.class || '');
+
+  let pool;
+  if (milestone) {
+    pool = bank.milestone;
+  } else {
+    // 70% 職業特定，30% 通用
+    const useClass = Math.random() < 0.7;
+    const classPool = bank[cKey] || bank.generic;
+    pool = useClass ? classPool : bank.generic;
+  }
+
+  // 更新角色（XP + 對話計數）
+  if (!noSave) {
+    try {
+      await syncXp({
+        consumed: CONV_INPUT_EST,
+        produced: CONV_OUTPUT_EST,
+        conversations: 1,
+      });
+      // xp.mjs 已更新 character.json，重新讀取以獲取最新 level/xp
+      char = JSON.parse(readFileSync(CHARACTER_JSON, 'utf8'));
+    } catch (e) {
+      // fallback：只更新對話計數
+      char.conversations = conv;
+      char.updatedAt = new Date().toISOString();
+      writeFileSync(CHARACTER_JSON, JSON.stringify(char, null, 2), 'utf8');
+    }
+  }
+
+  const vars = {
+    level: char.level,
+    xp:    char.xp,
+    conv,
+    claw:      char.stats?.claw      || '?',
+    antenna:   char.stats?.antenna   || '?',
+    shell:     char.stats?.shell     || '?',
+    brain:     char.stats?.brain     || '?',
+    foresight: char.stats?.foresight || '?',
+    charm:     char.stats?.charm     || '?',
+  };
+
+  const line = fill(pick(pool), vars);
+
+  process.stdout.write(line + '\n');
   process.exit(0);
-}
-
-// 選模板
-const lang   = detectLang(char);
-const bank   = QUIPS[lang] || QUIPS.zh;
-const cKey   = classKey(char.class || '');
-
-let pool;
-if (milestone) {
-  pool = bank.milestone;
-} else {
-  // 70% 職業特定，30% 通用
-  const useClass = Math.random() < 0.7;
-  const classPool = bank[cKey] || bank.generic;
-  pool = useClass ? classPool : bank.generic;
-}
-
-const vars = {
-  level: char.level,
-  xp:    char.xp,
-  conv,
-  claw:      char.stats?.claw      || '?',
-  antenna:   char.stats?.antenna   || '?',
-  shell:     char.stats?.shell     || '?',
-  brain:     char.stats?.brain     || '?',
-  foresight: char.stats?.foresight || '?',
-  charm:     char.stats?.charm     || '?',
-};
-
-const line = fill(pick(pool), vars);
-
-// 更新角色
-if (!noSave) {
-  char.conversations = conv;
-  char.updatedAt = new Date().toISOString();
-  writeFileSync(CHARACTER_JSON, JSON.stringify(char, null, 2), 'utf8');
-}
-
-process.stdout.write(line + '\n');
-process.exit(0);
+})().catch(() => process.exit(0));
