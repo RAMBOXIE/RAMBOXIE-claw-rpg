@@ -9,10 +9,10 @@
  *   node scripts/init.mjs --recalc      # 仅重算属性/职业（保留 XP/等级）
  */
 
-import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync, copyFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import {
-  CHARACTER_FILE, SOUL_FILE, MEMORY_FILE, SKILL_ROOT, WORKSPACE, SCRIPTS_URL
+  CHARACTER_FILE, DATA_DIR, SOUL_FILE, MEMORY_FILE, SKILL_ROOT, WORKSPACE, SCRIPTS_URL
 } from './_paths.mjs';
 import { join } from 'path';
 import {
@@ -32,6 +32,16 @@ function extractName(text) {
 }
 
 async function run() {
+  // 確保資料目錄存在（workspace/claw-rpg/）
+  mkdirSync(DATA_DIR, { recursive: true });
+
+  // 遷移：若舊位置（skill 根目錄）有 character.json，搬過來
+  const legacyFile = join(SKILL_ROOT, 'character.json');
+  if (!existsSync(CHARACTER_FILE) && existsSync(legacyFile)) {
+    copyFileSync(legacyFile, CHARACTER_FILE);
+    console.log('📦 已從舊位置遷移 character.json → workspace/claw-rpg/');
+  }
+
   // 安全检查
   if (existsSync(CHARACTER_FILE) && !force && !recalc) {
     console.log('⚠️  character.json 已存在。');
