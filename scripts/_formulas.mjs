@@ -43,9 +43,9 @@ export function calcXpGain({ consumed = 0, produced = 0, bonusXp = 0 } = {}) {
 // ── 转职 (Prestige) ───────────────────────────────────────────
 
 export const PRESTIGE_TITLES = [
-  '小龙虾', '龙虾战士', '龙虾武士', '龙虾将领',
-  '龙虾将军', '传说龙虾', '神话龙虾', '史诗龙虾',
-  '上古龙虾', '永恒龙虾', '混沌龙虾',
+  'Apprentice', 'Warrior Lobster', 'Knight Lobster', 'Commander Lobster',
+  'General Lobster', 'Legendary Lobster', 'Mythic Lobster', 'Epic Lobster',
+  'Ancient Lobster', 'Eternal Lobster', 'Chaos Lobster',
 ];
 
 export function prestigeTitle(prestige) {
@@ -257,47 +257,47 @@ export function calcInitiative(stats) {
 
 const FEAT_NAMES = {
   barbarian: {
-    general: ['野性本能','蠻力突破','粗野衝鋒','剛猛體魄','原始直覺','鐵皮膚','狂野重擊','不滅之志'],
+    general: ['Primal Instinct','Power Surge','Wild Charge','Iron Constitution','Savage Sense','Thick Hide','Brutal Strike','Undying Will'],
     bonus:   [],
   },
   fighter: {
-    general: ['鐵壁防守','格鬥技巧','堅毅戰鬥','重擊技巧','戰術大師','堅不可摧','無畏戰士','永恆鬥魂'],
-    bonus:   ['武器精通','武器特化','護盾掌握','強力攻擊','戰場靈活','武器嫻熟','閃電反擊','盔甲熟練','戰鬥直覺','戰神天賦','破甲重擊'],
+    general: ['Iron Defense','Combat Expertise','Steadfast Fighter','Power Attack','Tactical Master','Indomitable','Fearless Warrior','Eternal Grit'],
+    bonus:   ['Weapon Focus','Weapon Specialization','Shield Mastery','Improved Power Attack','Combat Reflexes','Weapon Versatility','Lightning Riposte','Armor Proficiency','Combat Intuition','War God Talent','Armor Penetration'],
   },
   paladin: {
-    general: ['神聖誓言','光明之路','聖盾守護','神恩加持','聖光驅邪','永恆聖心','神聖護法','天界庇護'],
+    general: ['Sacred Oath','Path of Light','Holy Shield','Divine Blessing','Radiant Drive','Eternal Heart','Divine Guardian','Celestial Ward'],
     bonus:   [],
   },
   ranger: {
-    general: ['獵手眼力','野外潛行','精準射擊','自然親和','追蹤大師','疾風步法','林間游俠','頂級獵人'],
+    general: ["Hunter's Eye",'Wilderness Stealth','Precise Shot','Nature Affinity','Track Master','Swift Stride','Woodland Ranger','Supreme Hunter'],
     bonus:   [],
   },
   cleric: {
-    general: ['神術強化','虔誠祈禱','神聖護盾','驅魔術法','神恩庇護','聖光洗禮','神跡顯現','天界使者'],
+    general: ['Spell Power','Devout Prayer','Sacred Defense','Exorcism','Divine Mercy','Holy Baptism','Divine Miracle','Celestial Envoy'],
     bonus:   [],
   },
   druid: {
-    general: ['自然親和','形態掌控','生態感知','大地之力','自然守護','野性形態','自然之心','生命循環'],
+    general: ['Nature Affinity','Shape Control','Ecosystem Sense','Earth Force','Nature Ward','Wild Form','Heart of Nature','Life Cycle'],
     bonus:   [],
   },
   monk: {
-    general: ['禪心靜氣','迅捷步法','氣功修煉','心靈空明','武道精進','無影腳法','禪定境界','無我之道'],
+    general: ['Zen Mind','Swift Footwork','Ki Cultivation','Diamond Mind','Martial Mastery','Shadowless Kick','Meditative State','Egoless Way'],
     bonus:   [],
   },
   rogue: {
-    general: ['影步潛行','精準打擊','閃避本能','暗器技巧','情報蒐集','完美偷襲','黑暗視野','影殺術'],
+    general: ['Shadow Step','Precision Strike','Evasive Instinct','Thrown Weapon','Intel Gathering','Perfect Ambush','Darkvision','Shadow Assassination'],
     bonus:   [],
   },
   bard: {
-    general: ['詩性感染','口若懸河','激勵士氣','反迷惑術','百語天才','魅力橫溢','靈感激發','傳世歌謠'],
+    general: ['Poetic Resonance','Silver Tongue','Rally Morale','Counter Enchantment','Polyglot','Charismatic Aura','Inspire Greatness','Timeless Song'],
     bonus:   [],
   },
   wizard: {
-    general: ['奧術敏銳','秘法研究','知識廣博','元素掌控','法術強化','魔法感知','奧義洞察','全知境界'],
+    general: ['Arcane Acuity','Spellbook Research','Broad Knowledge','Elemental Mastery','Spell Power','Magic Sense','Arcane Insight','Omniscient Mind'],
     bonus:   [],
   },
   sorcerer: {
-    general: ['龍血覺醒','本能施法','術力強化','血脈共鳴','混沌爆發','天生法力','術士直覺','混沌化身'],
+    general: ['Draconic Awakening','Innate Spellcasting','Surging Power','Bloodline Resonance','Chaos Burst','Born Caster','Sorcerous Instinct','Chaos Incarnate'],
     bonus:   [],
   },
 };
@@ -315,7 +315,7 @@ export function calcFeats(classId, level) {
   let gIdx = 0;
   for (const l of generalLevels) {
     if (l > level) break;
-    const name = names.general[gIdx] || `一般專長 ${gIdx + 1}`;
+    const name = names.general[gIdx] || `General Feat ${gIdx + 1}`;
     feats.push({ level: l, name: `${name} (L${l})` });
     gIdx++;
   }
@@ -326,8 +326,8 @@ export function calcFeats(classId, level) {
     let bIdx = 0;
     for (const l of bonusLevels) {
       if (l > level) break;
-      const name = names.bonus[bIdx] || `戰士專長 ${bIdx + 1}`;
-      feats.push({ level: l, name: `${name} (L${l}) [戰士]` });
+      const name = names.bonus[bIdx] || `Fighter Feat ${bIdx + 1}`;
+      feats.push({ level: l, name: `${name} (L${l}) [Fighter]` });
       bIdx++;
     }
   }
@@ -341,17 +341,17 @@ export function calcFeats(classId, level) {
 // ── 技能 (Abilities) ──────────────────────────────────────────
 
 export const ABILITY_TABLE = {
-  barbarian: { 1: '狂暴',     4: '快速移動',  8: '野性直覺',  16: '堅不可摧' },
-  fighter:   { 1: '鬥士天賦', 4: '武器特化',  8: '戰場主宰',  16: '不屈鬥魂' },
-  paladin:   { 1: '驅逐邪惡', 4: '神聖恩典',  8: '聖光庇護',  16: '永恆聖誓' },
-  ranger:    { 1: '偏好敵人', 4: '野外移動',  8: '疾速射擊',  16: '頂級獵手' },
-  cleric:    { 1: '神術域能', 4: '驅逐不死',  8: '神聖護盾',  16: '神之化身' },
-  druid:     { 1: '自然之語', 4: '野性變身',  8: '生態感知',  16: '大自然之怒' },
-  monk:      { 1: '徒手攻擊', 4: '迅捷移動',  8: '心靈空明',  16: '無我境界' },
-  rogue:     { 1: '背刺',     4: '閃避本能',  8: '精準打擊',  16: '完美刺殺' },
-  bard:      { 1: '吟遊激勵', 4: '反迷惑語',  8: '百語精通',  16: '傳世名篇' },
-  wizard:    { 1: '奧術分析', 4: '秘法師徒',  8: '知識爆炸',  16: '全知之眼' },
-  sorcerer:  { 1: '本能施法', 4: '龍血覺醒',  8: '術力強化',  16: '混沌之源' },
+  barbarian: { 1: 'Rage',             4: 'Fast Movement',   8: 'Primal Instinct', 16: 'Indomitable' },
+  fighter:   { 1: 'Fighter Talent',   4: 'Weapon Mastery',  8: 'Battlefield Control', 16: 'Unbreakable Soul' },
+  paladin:   { 1: 'Smite Evil',       4: 'Divine Grace',    8: 'Sacred Shield',   16: 'Eternal Vow' },
+  ranger:    { 1: 'Favored Enemy',    4: 'Wilderness Stride',8: 'Swift Shot',      16: 'Master Hunter' },
+  cleric:    { 1: 'Domain Power',     4: 'Turn Undead',     8: 'Divine Shield',   16: 'Avatar of God' },
+  druid:     { 1: "Nature's Tongue",  4: 'Wild Shape',      8: 'Ecosystem Sense', 16: "Nature's Wrath" },
+  monk:      { 1: 'Unarmed Strike',   4: 'Swift Movement',  8: 'Diamond Mind',    16: 'Egoless State' },
+  rogue:     { 1: 'Sneak Attack',     4: 'Evasion',         8: 'Precision Strike', 16: 'Perfect Kill' },
+  bard:      { 1: 'Bardic Inspiration',4: 'Countersong',    8: 'Master of Tongues',16: 'Timeless Work' },
+  wizard:    { 1: 'Arcane Analysis',  4: 'Arcane Apprentice',8: 'Knowledge Explosion',16: 'All-Seeing Eye' },
+  sorcerer:  { 1: 'Innate Casting',   4: 'Draconic Bloodline',8: 'Spell Power',   16: 'Chaos Source' },
 };
 
 /** 获取某职业在某等级应拥有的全部技能（閾值：1/4/8/16）*/
