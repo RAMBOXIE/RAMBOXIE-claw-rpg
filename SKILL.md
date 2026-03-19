@@ -1,6 +1,6 @@
 ---
 name: claw-rpg
-description: D&D-style RPG character system for AI lobster assistants. Automatically generates a character sheet from SOUL.md and MEMORY.md, assigns class (wizard/bard/rogue/paladin/druid/fighter) and 6 stats, tracks XP from token usage (~80 XP/conversation), levels up from 1 to 999 with a prestige system, fires hidden easter egg flavor text during conversations, sends daily RPG reports, and includes an arena battle system. Use when: initializing a lobster's RPG character, syncing XP after conversations, checking level/stats, running prestige at Lv.999, launching the character dashboard, or scheduling daily RPG status reports.
+description: D&D 3.5 standard rules RPG character system for AI lobster assistants. Automatically generates a character sheet from SOUL.md and MEMORY.md, assigns one of 11 classes (barbarian/fighter/paladin/ranger/cleric/druid/monk/rogue/bard/wizard/sorcerer) and 6 stats mapped to D&D 3.5 ability scores (STR/DEX/CON/INT/WIS/CHA), tracks XP using D&D 3.5 standard formula (n*(n-1)/2*1000), computes derived stats (HP/AC/BAB/Fort/Ref/Will/Initiative), generates class feats, levels up with a prestige system, fires hidden easter egg flavor text during conversations, sends daily RPG reports, and includes an arena battle system. Use when: initializing a lobster's RPG character, syncing XP after conversations, checking level/stats/derived combat stats, running prestige, launching the character dashboard, or scheduling daily RPG status reports.
 ---
 
 # Claw RPG 🦞⚔️
