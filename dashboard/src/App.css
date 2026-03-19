@@ -71,85 +71,29 @@ body {
   pointer-events: none; z-index: 1;
 }
 
-/* ── Left wing: blade face gradient (outer left = cutting edge) ── */
+/* ── Left wing: Winamp EQ panel region of the image ────────────
+   Original 800×550 image scaled so its 210px EQ area = 230px wing.
+   scale=1.095 → rendered 876×602. EQ starts at original x=60 → -66px.
+   Centre vertically: -(602-280)/2 = -161px                        */
 .wl {
   grid-column: 1; grid-row: 2;
-  background: linear-gradient(90deg,
-    color-mix(in srgb, var(--cc,#14b8a6) 18%, #111) 0%,
-    #16122a 18%,
-    #0e0a1e 55%,
-    #0b0818 100%);
-  border-right: 2px solid var(--cc, #14b8a6);
+  background:
+    linear-gradient(rgba(2,8,2,0.42), rgba(2,8,2,0.42)),
+    url('/winamp-ref.jpg') -66px -161px / 876px auto no-repeat;
+  border-right: 2px solid var(--cc, #44cc44);
   border-left: none;
-  filter: drop-shadow(-4px 0 16px color-mix(in srgb, var(--cc,#14b8a6) 55%, transparent));
 }
-/* ── Right wing: mirror ── */
+
+/* ── Right wing: Winamp playlist panel region ──────────────────
+   Playlist area starts at original x=530 → scaled -580px          */
 .wr {
   grid-column: 3; grid-row: 2;
-  background: linear-gradient(270deg,
-    color-mix(in srgb, var(--cc,#14b8a6) 18%, #111) 0%,
-    #16122a 18%,
-    #0e0a1e 55%,
-    #0b0818 100%);
-  border-left: 2px solid var(--cc, #14b8a6);
+  background:
+    linear-gradient(rgba(2,8,2,0.42), rgba(2,8,2,0.42)),
+    url('/winamp-ref.jpg') -580px -161px / 876px auto no-repeat;
+  border-left: 2px solid var(--cc, #44cc44);
   border-right: none;
-  filter: drop-shadow(4px 0 16px color-mix(in srgb, var(--cc,#14b8a6) 55%, transparent));
 }
-
-/* ══════════════════════════════════════════════════════════
-   AXE HANDLE — vertical metallic pole that extends 110px
-   ABOVE the wing (into row-1 empty space) and 160px BELOW
-   (into row-3 empty space).  It sits at the OUTER edge of
-   each wing panel so it looks like a weapon handle.
-   ══════════════════════════════════════════════════════════ */
-.axe-handle {
-  /* Extends above & below the wing div */
-  position: absolute;
-  top:    -110px;
-  /* total = 110 (row1) + 280 (row2) + 160 (row3) = 550 */
-  height: 550px;
-  width:  16px;
-  border-radius: 4px;
-  /* metallic rod gradient (horizontal cross-section) */
-  background: linear-gradient(90deg,
-    #0c0a1a  0%,
-    #3a3858 15%,
-    #7878a0 30%,
-    #b4b4d0 46%,
-    #d8d8f0 50%,
-    #b4b4d0 54%,
-    #7878a0 70%,
-    #3a3858 85%,
-    #0c0a1a 100%);
-  border: 1px solid rgba(200,200,220,0.20);
-  box-shadow:
-    0 0 6px rgba(0,0,0,0.9),
-    inset 0 0 4px rgba(255,255,255,0.08);
-  z-index: 20;
-  pointer-events: none;
-  flex-shrink: 0;
-}
-
-/* Handle sits RIGHT AT the outer edge of the wing, so the blade SVG
-   (which starts at the wing edge) appears to be mounted on the handle */
-.wl .axe-handle { left:  -8px; }   /* centered at left edge of wing  */
-.wr .axe-handle { right: -8px; }   /* centered at right edge of wing */
-
-/* Handle end-caps (small knobs at top & bottom) */
-.axe-handle::before,
-.axe-handle::after {
-  content: '';
-  position: absolute;
-  left: -3px;
-  width: calc(100% + 6px);
-  height: 14px;
-  background: linear-gradient(90deg,
-    #1a1830, #aaaacc 40%, #e0e0f8 50%, #aaaacc 60%, #1a1830);
-  border-radius: 4px;
-  border: 1px solid rgba(220,220,255,0.25);
-}
-.axe-handle::before { top: 0;    }
-.axe-handle::after  { bottom: 0; }
 
 .wing-hdr {
   font-size: 8px;

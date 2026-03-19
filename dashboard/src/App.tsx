@@ -204,14 +204,9 @@ function AlienHeadShape({ color, width=300, height=550 }: { color:string; width?
             height: imgH,
             imageRendering: 'auto',
             /* Darken & desaturate to blend with dark theme */
-            filter: 'brightness(0.55) saturate(0.7)',
+            filter: 'brightness(0.78) saturate(0.85)',
           }}
         />
-        {/* Dark vignette over image so content text remains readable */}
-        <div style={{
-          position:'absolute', inset:0,
-          background:'radial-gradient(ellipse at 50% 35%, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.65) 100%)',
-        }}/>
       </div>
 
       {/* ── Layer 2: Glowing shield border SVG (drawn OUTSIDE the clip) ── */}
@@ -356,7 +351,8 @@ export default function App() {
   )
 
   const cls        = CLASSES[char.class] || { en:char.class, icon:'🦞', color:'#14b8a6' }
-  const cc         = cls.color                          // classColor shorthand
+  const lobsterColor = cls.color                         // class color only for lobster sprite
+  const cc         = '#44cc44'                           // Winamp skin green for all UI
   const title      = TITLES[Math.min(char.prestige, TITLES.length-1)]
   const progress   = levelProgress(char.xp, char.level)
   const toNext     = xpToNext(char.xp, char.level)
@@ -371,6 +367,7 @@ export default function App() {
   const saves      = char.saves??{ fort:0, ref:0, will:0 }
   const EQ_SEGS    = 12
   void (SoulWeb as unknown)
+  void (BladeSvg as unknown)
 
   return (
     <div className="page-wrap" style={{ '--cc':cc, '--rc':rarity.color } as React.CSSProperties}>
@@ -392,8 +389,6 @@ export default function App() {
 
         {/* ─── Left EQ wing: col 2, ROW 2 ONLY ─── */}
         <div className="wing wl">
-          <div className="axe-handle"/>
-          <BladeSvg side="left" color={cc}/>
           <div className="wing-hdr">EQUALIZER</div>
 
           <div className="eq-bars">
@@ -470,7 +465,7 @@ export default function App() {
               <div className="crt-inner">
                 <div className="crt-scanlines"/>
                 <div className="crt-rune">{rune}</div>
-                <LobsterSprite classColor={cc} size={155}/>
+                <LobsterSprite classColor={lobsterColor} size={155}/>
               </div>
             </div>
             <div className="h-id">
@@ -499,8 +494,6 @@ export default function App() {
 
         {/* ─── Right playlist wing: col 4, ROW 2 ONLY ─── */}
         <div className="wing wr">
-          <div className="axe-handle"/>
-          <BladeSvg side="right" color={cc}/>
           <div className="wing-hdr">
             FEATS <span className="f-cnt">{String(feats.length).padStart(2,'0')}</span>
           </div>
