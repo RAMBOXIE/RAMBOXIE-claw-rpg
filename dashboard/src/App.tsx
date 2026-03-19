@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
 import './App.css'
 
-// ── Types ─────────────────────────────────────────────────────
-
+// ── Types ────────────────────────────────────────────────────────
 interface Stats {
   claw: number; antenna: number; shell: number;
   brain: number; foresight: number; charm: number;
@@ -13,7 +12,7 @@ interface Character {
   tokens: { consumed: number; produced: number };
   conversations: number;
   classHistory: Array<{ from: string; to: string; date: string }>;
-  levelHistory: Array<{ level: number; date: string }>;
+  levelHistory:  Array<{ level: number; date: string }>;
   updatedAt: string;
   prestigeXpMultiplier?: number;
   hp?: number; ac?: number; bab?: number;
@@ -21,8 +20,7 @@ interface Character {
   initiative?: number; feats?: string[];
 }
 
-// ── Constants ─────────────────────────────────────────────────
-
+// ── Constants ────────────────────────────────────────────────────
 const CLASSES: Record<string, { en: string; icon: string; color: string }> = {
   barbarian: { en: 'Berserker Lobster', icon: '🪓', color: '#ea580c' },
   fighter:   { en: 'Fighter Lobster',   icon: '⚔️',  color: '#dc2626' },
@@ -36,53 +34,7 @@ const CLASSES: Record<string, { en: string; icon: string; color: string }> = {
   wizard:    { en: 'Wizard Lobster',    icon: '🧙',  color: '#1d4ed8' },
   sorcerer:  { en: 'Sorcerer Lobster',  icon: '🔮',  color: '#7e22ce' },
 }
-const TITLES = [
-  'Apprentice','Warrior Lobster','Knight Lobster','Commander Lobster','General Lobster',
-  'Legendary Lobster','Mythic Lobster','Epic Lobster','Ancient Lobster','Eternal Lobster','Chaos Lobster',
-]
-const STAT_INFO: Record<string, { dnd: string }> = {
-  claw:      { dnd: 'STR' },
-  antenna:   { dnd: 'DEX' },
-  shell:     { dnd: 'CON' },
-  brain:     { dnd: 'INT' },
-  foresight: { dnd: 'WIS' },
-  charm:     { dnd: 'CHA' },
-}
-const STAT_COLORS: Record<string, string> = {
-  claw:'#ef4444', antenna:'#22c55e', shell:'#f97316',
-  brain:'#3b82f6', foresight:'#eab308', charm:'#a855f7',
-}
-const STAT_KEYS = ['claw','antenna','shell','brain','foresight','charm']
-
-function deriveMBTI(stats: Stats, bab: number): string {
-  const EI = stats.claw > stats.brain ? 'E' : 'I'
-  const SN = stats.charm > stats.foresight ? 'S' : 'N'
-  const TF = stats.shell > stats.antenna ? 'T' : 'F'
-  const JP = bab > 5 ? 'J' : 'P'
-  return EI + SN + TF + JP
-}
-const MBTI_NAMES: Record<string,string> = {
-  'INTJ':'The Architect','INTP':'The Logician','ENTJ':'The Commander','ENTP':'The Debater',
-  'INFJ':'The Advocate','INFP':'The Mediator','ENFJ':'The Protagonist','ENFP':'The Campaigner',
-  'ISTJ':'The Logistician','ISFJ':'The Defender','ESTJ':'The Executive','ESFJ':'The Consul',
-  'ISTP':'The Virtuoso','ISFP':'The Adventurer','ESTP':'The Entrepreneur','ESFP':'The Entertainer',
-}
-function deriveAlignment(stats: Stats): string {
-  const lc = stats.foresight + stats.shell
-  const ge = stats.charm + stats.foresight
-  const law  = lc >= 26 ? 'Lawful'  : lc <= 18 ? 'Chaotic' : 'Neutral'
-  const good = ge >= 26 ? 'Good'    : ge <= 18 ? 'Evil'    : 'Neutral'
-  return (law === 'Neutral' && good === 'Neutral') ? 'True Neutral' : `${law} ${good}`
-}
-function getRarity(level: number) {
-  if (level >= 100) return { label: 'MYTHIC',    color: '#f0abfc' }
-  if (level >= 61)  return { label: 'LEGENDARY', color: '#fbbf24' }
-  if (level >= 31)  return { label: 'EPIC',       color: '#a78bfa' }
-  if (level >= 16)  return { label: 'RARE',       color: '#60a5fa' }
-  if (level >= 6)   return { label: 'UNCOMMON',   color: '#4ade80' }
-  return               { label: 'COMMON',     color: '#94a3b8' }
-}
-const CATCHPHRASES: Record<string,string> = {
+const CATCHPHRASES: Record<string, string> = {
   barbarian:'Rage first. Think later.',
   fighter:'My claws never missed.',
   paladin:'Justice is a weapon.',
@@ -95,20 +47,40 @@ const CATCHPHRASES: Record<string,string> = {
   wizard:"I've read 17 books on this mistake.",
   sorcerer:'Born with it. Not learned.',
 }
-const CLASS_RUNE: Record<string,string> = {
-  barbarian:'🪓',fighter:'⚔️',paladin:'🛡️',ranger:'🏹',
-  cleric:'✝️',druid:'🌿',monk:'👊',rogue:'🗡️',bard:'🎭',wizard:'🧙',sorcerer:'🔮',
+const TITLES = [
+  'Apprentice','Warrior Lobster','Knight Lobster','Commander Lobster',
+  'General Lobster','Legendary Lobster','Mythic Lobster','Epic Lobster',
+  'Ancient Lobster','Eternal Lobster','Chaos Lobster',
+]
+
+// ── Helpers ──────────────────────────────────────────────────────
+function xpForLevel(n: number) { return n <= 1 ? 0 : (n*(n-1)/2)*1000 }
+function levelProgress(xp: number, level: number) {
+  if (level >= 999) return 100
+  const s = xpForLevel(level), e = xpForLevel(level+1)
+  return Math.min(100, Math.floor(((xp-s)/(e-s))*100))
 }
-const ABILITY_ICONS: Record<string,string[]> = {
-  barbarian:['💢','⚡','🔥','🔱'],fighter:['⚔️','🗡️','🏟️','🛡️'],
-  paladin:['☀️','✨','🛡️','⚜️'],ranger:['🏹','🌲','💨','🦅'],
-  cleric:['✝️','💀','🌟','👼'],druid:['🌿','🐺','🌊','🌀'],
-  monk:['👊','💨','🧘','☯️'],rogue:['🗡️','👁️','💎','☠️'],
-  bard:['🎵','💬','🎭','📖'],wizard:['🔮','📚','⚡','👁️'],sorcerer:['🐉','💫','⚡','🌀'],
+function xpToNext(xp: number, level: number) {
+  return level >= 999 ? 0 : xpForLevel(level+1)-xp
+}
+function fmtNum(n: number) { return n.toLocaleString() }
+function fmtSign(n: number) { return (n>=0?'+':'')+n }
+
+function deriveMBTI(stats: Stats, bab: number): string {
+  return (stats.claw > stats.brain ? 'E' : 'I')
+       + (stats.charm > stats.foresight ? 'S' : 'N')
+       + (stats.shell > stats.antenna  ? 'T' : 'F')
+       + (bab > 5 ? 'J' : 'P')
+}
+function deriveAlignment(stats: Stats): string {
+  const lc = stats.foresight + stats.shell
+  const ge = stats.charm + stats.foresight
+  const law  = lc >= 26 ? 'Lawful'  : lc <= 18 ? 'Chaotic' : 'Neutral'
+  const good = ge >= 26 ? 'Good'    : ge <= 18 ? 'Evil'    : 'Neutral'
+  return (law === 'Neutral' && good === 'Neutral') ? 'True Neutral' : `${law} ${good}`
 }
 
-// ── Pixel Lobster ─────────────────────────────────────────────
-
+// ── Pixel Lobster ────────────────────────────────────────────────
 const LOBSTER_PIXELS: [number,number,string][] = [
   [3,0,'A'],[8,0,'A'],[2,1,'A'],[9,1,'A'],[1,2,'A'],[10,2,'A'],
   [4,3,'H'],[5,3,'H'],[6,3,'H'],[7,3,'H'],
@@ -127,207 +99,37 @@ const LOBSTER_PIXELS: [number,number,string][] = [
   [2,11,'T'],[3,11,'T'],[5,11,'T'],[6,11,'T'],[8,11,'T'],[9,11,'T'],
   [1,12,'T'],[2,12,'T'],[5,12,'T'],[6,12,'T'],[9,12,'T'],[10,12,'T'],
   [0,13,'T'],[1,13,'T'],[10,13,'T'],[11,13,'T'],
-  [5,3,'X'],[4,5,'X'],
 ]
-function LobsterSprite({ classColor, size=160 }: { classColor:string; size?:number }) {
+function LobsterSprite({ classColor, size=160 }: { classColor: string; size?: number }) {
   const COLS=12, ROWS=14, px=size/COLS
-  const cm: Record<string,string> = { A:'#94a3b8',H:classColor,W:'#fff',C:classColor,B:classColor,T:classColor,X:'rgba(255,255,255,0.25)' }
-  const om: Record<string,number> = { A:0.9,H:1,W:1,C:0.72,B:1,T:0.82,X:1 }
+  const cm: Record<string,string> = { A:'#94a3b8',H:classColor,W:'#fff',C:classColor,B:classColor,T:classColor }
+  const om: Record<string,number> = { A:0.9,H:1,W:1,C:0.72,B:1,T:0.82 }
   return (
     <svg width={size} height={ROWS*px} viewBox={`0 0 ${size} ${ROWS*px}`}
-      style={{ imageRendering:'pixelated', display:'block', margin:'0 auto' }} className="lobster-sprite">
+      style={{ imageRendering:'pixelated', display:'block', margin:'0 auto' }}>
       <defs>
-        <filter id="lg" x="-30%" y="-30%" width="160%" height="160%">
-          <feGaussianBlur stdDeviation="3" result="blur"/>
-          <feFlood floodColor={classColor} floodOpacity="0.5" result="c"/>
+        <filter id="lg2" x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur stdDeviation="2" result="blur"/>
+          <feFlood floodColor={classColor} floodOpacity="0.6" result="c"/>
           <feComposite in="c" in2="blur" operator="in" result="g"/>
           <feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
       </defs>
-      <g filter="url(#lg)">
-        {LOBSTER_PIXELS.map(([col,row,type],i) => (
+      <g filter="url(#lg2)">
+        {LOBSTER_PIXELS.map(([col,row,type],i)=>(
           <rect key={i} x={col*px} y={row*px} width={px} height={px}
-            fill={cm[type]??classColor} opacity={om[type]??1}
-            className={type==='W'?'lobster-eye':undefined}/>
+            fill={cm[type]??classColor} opacity={om[type]??1}/>
         ))}
       </g>
     </svg>
   )
 }
 
-// ── Alien Head: real Winamp image + shield clip-path ─────────
-// The actual 3D alien face from the reference image is used as
-// the visual. An SVG shield outline is drawn on top.
-
-function AlienHeadShape({ color, width=300, height=550 }: { color:string; width?:number; height?:number }) {
-  const w = width, h = height
-
-  // Shield silhouette (heater / heraldic shield):
-  // flat top → straight sides → curved converging to pointed tip
-  const head = `
-    M 0,0
-    L ${w},0
-    L ${w},${h*0.68}
-    Q ${w*0.98},${h*0.80} ${w*0.72},${h*0.90}
-    Q ${w*0.56},${h*0.97} ${w*0.5},${h}
-    Q ${w*0.44},${h*0.97} ${w*0.28},${h*0.90}
-    Q ${w*0.02},${h*0.80} 0,${h*0.68}
-    Z
-  `
-
-  // The Winamp image is ~800×550px.
-  // Alien head region starts at roughly x=270, width≈260px.
-  // We scale the image so the head fills our 300px-wide div.
-  // Scale factor = 300/260 ≈ 1.154  →  image renders as 924×635px
-  // Then shift left by 270*1.154 ≈ 312px to center on the head.
-  const imgW = 924
-  const imgH = 635
-  const imgOffX = -312
-
-  return (
-    <div style={{ position:'absolute', inset:0, zIndex:0 }}>
-
-      {/* ── Layer 1: Real Winamp alien face image, clipped to shield shape ── */}
-      <div style={{
-        position: 'absolute', inset: 0,
-        clipPath: `path("${head.trim().replace(/\s+/g,' ')}")`,
-        overflow: 'hidden',
-      }}>
-        <img
-          src="/winamp-ref.jpg"
-          alt=""
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: imgOffX,
-            width:  imgW,
-            height: imgH,
-            imageRendering: 'auto',
-            /* Darken & desaturate to blend with dark theme */
-            filter: 'brightness(0.78) saturate(0.85)',
-          }}
-        />
-      </div>
-
-      {/* ── Layer 2: Glowing shield border SVG (drawn OUTSIDE the clip) ── */}
-      <svg
-        viewBox={`0 0 ${w} ${h}`}
-        xmlns="http://www.w3.org/2000/svg"
-        style={{ position:'absolute', inset:0, width:'100%', height:'100%', overflow:'visible', zIndex:1 }}
-      >
-        <defs>
-          <filter id="hglow" x="-25%" y="-10%" width="150%" height="120%">
-            <feGaussianBlur stdDeviation="10" result="blur"/>
-            <feFlood floodColor={color} floodOpacity="0.75" result="c"/>
-            <feComposite in="c" in2="blur" operator="in" result="g"/>
-            <feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge>
-          </filter>
-        </defs>
-        {/* Outer glowing shield border */}
-        <path d={head} fill="none" stroke={color} strokeWidth="2.5"
-          filter="url(#hglow)" opacity="0.9"/>
-        {/* Inner bevel */}
-        <path d={head} fill="none" stroke="rgba(255,255,255,0.10)" strokeWidth="1"
-          transform={`translate(4,3) scale(${(w-8)/w},${(h-5)/h})`}/>
-      </svg>
-    </div>
-  )
-}
-
-// ── Axe Blade SVG ─────────────────────────────────────────────
-// Positioned outside the wing div (left: -110px / right: -110px)
-// so it visually extends BEYOND the panel without clipping any content.
-// Shape: crescent half-moon — widest at mid-height, tapers top & bottom.
-// The axe-handle pole passes through the inner attachment zone.
-
-function BladeSvg({ side, color }: { side: 'left'|'right'; color: string }) {
-  const isL = side === 'left'
-  const W = 110   // how far the blade sticks out
-  const H = 280   // matches wing height (row-2 = 280px)
-
-  // ── Blade path (in local SVG coords, W × H) ──────────────────
-  // For LEFT blade:  inner attachment edge is at x=W, outer tip at x=0
-  // For RIGHT blade: inner attachment edge is at x=0, outer tip at x=W
-  const bladePath = isL
-    ? `M ${W},0 L ${W},${H} Q ${W*0.25},${H*0.83} 0,${H*0.5} Q ${W*0.25},${H*0.17} ${W},0 Z`
-    : `M 0,0 L 0,${H} Q ${W*0.75},${H*0.83} ${W},${H*0.5} Q ${W*0.75},${H*0.17} 0,0 Z`
-
-  // Cutting-edge highlight path (just the outer curved edge, no fill)
-  const edgePath = isL
-    ? `M ${W},0 Q ${W*0.25},${H*0.17} 0,${H*0.5} Q ${W*0.25},${H*0.83} ${W},${H}`
-    : `M 0,0 Q ${W*0.75},${H*0.17} ${W},${H*0.5} Q ${W*0.75},${H*0.83} 0,${H}`
-
-  return (
-    <svg
-      viewBox={`0 0 ${W} ${H}`}
-      xmlns="http://www.w3.org/2000/svg"
-      style={{
-        position: 'absolute',
-        top: 0,
-        [isL ? 'right' : 'left']: '100%',   // flush against outer edge of wing
-        width: W,
-        height: H,
-        overflow: 'visible',
-        zIndex: 5,
-        pointerEvents: 'none',
-      }}
-    >
-      <defs>
-        <linearGradient id={`blg-${side}`}
-          x1={isL ? '1' : '0'} y1="0" x2={isL ? '0' : '1'} y2="0">
-          <stop offset="0%"   stopColor={color} stopOpacity="0.55"/>
-          <stop offset="60%"  stopColor={color} stopOpacity="0.22"/>
-          <stop offset="100%" stopColor={color} stopOpacity="0.05"/>
-        </linearGradient>
-        <filter id={`bgl-${side}`} x="-30%" y="-10%" width="160%" height="120%">
-          <feGaussianBlur stdDeviation="6" result="b"/>
-          <feFlood floodColor={color} floodOpacity="0.7" result="c"/>
-          <feComposite in="c" in2="b" operator="in" result="g"/>
-          <feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
-      </defs>
-
-      {/* Blade fill */}
-      <path d={bladePath} fill={`url(#blg-${side})`}/>
-
-      {/* Glowing border */}
-      <path d={bladePath} fill="none" stroke={color} strokeWidth="2"
-        filter={`url(#bgl-${side})`}/>
-
-      {/* Cutting-edge highlight (bright white shimmer on outer curve) */}
-      <path d={edgePath} fill="none" stroke="rgba(255,255,255,0.45)" strokeWidth="1.2"/>
-
-      {/* Inner bevel line */}
-      <path d={bladePath} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="1"
-        transform={isL
-          ? `translate(-2,3) scale(${(W-4)/W},${(H-6)/H})`
-          : `translate(2,3) scale(${(W-4)/W},${(H-6)/H})`}/>
-    </svg>
-  )
-}
-
-// ── SoulWeb (kept, not rendered) ──────────────────────────────
-function SoulWeb(_p: { stats:Stats; classColor:string; size?:number }) { return null }
-
-// ── Formulas ──────────────────────────────────────────────────
-function xpForLevel(n:number) { return n<=1 ? 0 : (n*(n-1)/2)*1000 }
-function levelProgress(xp:number, level:number) {
-  if (level>=999) return 100
-  const s=xpForLevel(level), e=xpForLevel(level+1)
-  return Math.min(100, Math.floor(((xp-s)/(e-s))*100))
-}
-function xpToNext(xp:number, level:number) { return level>=999 ? 0 : xpForLevel(level+1)-xp }
-function fmtNum(n:number) { return n.toLocaleString() }
-function fmtSign(n:number) { return (n>=0?'+':'')+n }
-
-
-
-// ── App ───────────────────────────────────────────────────────
-
+// ── App ──────────────────────────────────────────────────────────
 export default function App() {
   const [char, setChar]       = useState<Character|null>(null)
-  const [error, setError]     = useState<string|null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError]     = useState<string|null>(null)
 
   useEffect(() => {
     fetch('/api/character')
@@ -342,203 +144,109 @@ export default function App() {
     return () => es.close()
   }, [])
 
-  if (loading) return <div className="center-msg"><h2>🦞 Loading…</h2></div>
-  if (error || !char) return (
-    <div className="center-msg">
-      <h2>No character found</h2>
-      <code>node scripts/init.mjs</code>
-    </div>
-  )
+  if (loading) return <div className="skin-msg">🦞 Loading…</div>
+  if (error || !char) return <div className="skin-msg">No character data.<br/><code>node scripts/init.mjs</code></div>
 
-  const cls        = CLASSES[char.class] || { en:char.class, icon:'🦞', color:'#14b8a6' }
-  const lobsterColor = cls.color                         // class color only for lobster sprite
-  const cc         = '#44cc44'                           // Winamp skin green for all UI
-  const title      = TITLES[Math.min(char.prestige, TITLES.length-1)]
-  const progress   = levelProgress(char.xp, char.level)
-  const toNext     = xpToNext(char.xp, char.level)
-  const mbti       = deriveMBTI(char.stats, char.bab??0)
-  const mbtiName   = MBTI_NAMES[mbti]??''
-  const alignment  = deriveAlignment(char.stats)
-  const rarity     = getRarity(char.level)
-  const phrase     = CATCHPHRASES[char.class]??'Ready.'
-  const rune       = CLASS_RUNE[char.class]??'🦞'
-  const feats      = char.feats??[]
-  const abilities  = char.abilities??[]
-  const saves      = char.saves??{ fort:0, ref:0, will:0 }
-  const EQ_SEGS    = 12
-  void (SoulWeb as unknown)
-  void (BladeSvg as unknown)
+  const cls          = CLASSES[char.class] || { en: char.class, icon:'🦞', color:'#dc2626' }
+  const lobsterColor = cls.color
+  const progress     = levelProgress(char.xp, char.level)
+  const toNext       = xpToNext(char.xp, char.level)
+  const mbti         = deriveMBTI(char.stats, char.bab??0)
+  const alignment    = deriveAlignment(char.stats)
+  const title        = TITLES[Math.min(char.prestige, TITLES.length-1)]
+  const phrase       = CATCHPHRASES[char.class] ?? 'Ready.'
+  const saves        = char.saves ?? { fort:0, ref:0, will:0 }
+
+  // ── Coordinate map (percentages of 1280×960 image) ─────────────
+  // Black screen : x=500, y=155, w=290, h=250
+  // Left  panel  : x=160, y=330, w=370, h=150
+  // Right panel  : x=760, y=330, w=370, h=150
+  // Face area    : x=480, y=490, w=320, h=310
+  const pct = (x: number, y: number, w: number, h: number) => ({
+    position: 'absolute' as const,
+    left:   `${(x/1280*100).toFixed(3)}%`,
+    top:    `${(y/960*100).toFixed(3)}%`,
+    width:  `${(w/1280*100).toFixed(3)}%`,
+    height: `${(h/960*100).toFixed(3)}%`,
+  })
 
   return (
-    <div className="page-wrap" style={{ '--cc':cc, '--rc':rarity.color } as React.CSSProperties}>
+    <div className="skin-wrap">
+      {/* ── Base image ── */}
+      <img src="/winamp-skin.jpg" className="skin-img" alt="Winamp skin"/>
 
-      {/*
-        ╔═══════════════════════════════════════════════════════════════╗
-        ║  WINAMP GRID                                                  ║
-        ║  Cols: [spk-L] [wing-L] [HEAD] [wing-R] [spk-R]              ║
-        ║  Rows: [r1-top 110px] [r2-wings 280px] [r3-chin 160px]        ║
-        ║                                                               ║
-        ║  spk-L/R  → rows 1-3 (full height, invisible filler in r1/r3)║
-        ║  wing-L/R → row 2 ONLY (the horizontal "arms")               ║
-        ║  HEAD     → rows 1-3 (protrudes above and below wings)        ║
-        ╚═══════════════════════════════════════════════════════════════╝
-      */}
-      <div className="wg">
-
-
-
-        {/* ─── Left EQ wing: col 2, ROW 2 ONLY ─── */}
-        <div className="wing wl">
-          <div className="wing-hdr">EQUALIZER</div>
-
-          <div className="eq-bars">
-            {STAT_KEYS.map(k => {
-              const val   = char.stats[k as keyof Stats]??10
-              const color = STAT_COLORS[k]
-              const lit   = Math.round((val/20)*EQ_SEGS)
-              return (
-                <div className="eq-col" key={k}>
-                  <div className="eq-track">
-                    {Array.from({length:EQ_SEGS},(_,i)=>(
-                      <div key={i} className={`eq-seg${EQ_SEGS-1-i<lit?' lit':''}`}
-                        style={{'--sc':color} as React.CSSProperties}/>
-                    ))}
-                  </div>
-                  <div className="eq-lbl" style={{color}}>{STAT_INFO[k].dnd}</div>
-                  <div className="eq-num">{val}</div>
-                </div>
-              )
-            })}
-          </div>
-
-          <div className="saves">
-            {([['FORT',saves.fort??0],['REF',saves.ref??0],['WILL',saves.will??0]] as [string,number][])
-              .map(([l,v])=>(
-              <div className="save-row" key={l}>
-                <span className="s-lbl">{l}</span>
-                <div className="s-track">
-                  <div className="s-fill" style={{width:`${Math.min(100,Math.max(4,((v+12)/24)*100))}%`}}/>
-                  <div className="s-thumb" style={{left:`${Math.min(94,Math.max(2,((v+12)/24)*100))}%`}}/>
-                </div>
-                <span className="s-val">{fmtSign(v)}</span>
-              </div>
-            ))}
-          </div>
-
-          <div className="wing-stats">
-            {[{l:'HP',v:String(char.hp??'—')},{l:'AC',v:String(char.ac??'—')},{l:'BAB',v:char.bab!=null?fmtSign(char.bab):'—'}]
-              .map(s=>(
-              <div className="ws" key={s.l}>
-                <span className="ws-v" style={{color:cc}}>{s.v}</span>
-                <span className="ws-l">{s.l}</span>
-              </div>
-            ))}
+      {/* ════════════════════════════════════════════════════════
+          CENTER BLACK SCREEN — Lobster + identity
+          ════════════════════════════════════════════════════════ */}
+      <div className="skin-screen" style={pct(500,155,290,250)}>
+        <div className="screen-scanlines"/>
+        <div className="screen-inner">
+          <LobsterSprite classColor={lobsterColor} size={130}/>
+          <div className="screen-id">
+            <span className="sc-mbti">{mbti}</span>
+            <span className="sc-dot"> · </span>
+            <span className="sc-align">{alignment}</span>
           </div>
         </div>
+      </div>
 
-        {/*
-          ══════════════════════════════════════════════
-          CENTER HEAD — col 3, rows 1-3
-          AlienHeadShape SVG provides the head silhouette.
-          Content is layered on top in 3 zones.
-          ══════════════════════════════════════════════
-        */}
-        <div className="head">
-          {/* The actual head shape drawn as SVG */}
-          <AlienHeadShape color={cc} width={300} height={550}/>
-
-          {/* ── Zone 1: TOP (above wings, 110px) ── */}
-          <div className="hz hz-top">
-            <div className="h-title">CLAW RPG</div>
-            <div className="trow">
-              <div className="tbtn">{char.prestige>0?`★${char.prestige}`:'◀◀'}</div>
-              <div className="tbtn t-cls">{cls.icon}</div>
-              <div className="tbtn t-lvl">{char.level}</div>
-              <div className="tbtn t-rar" style={{color:rarity.color}}>{rarity.label.slice(0,3)}</div>
-              <div className="tbtn">{progress}%</div>
-            </div>
+      {/* ════════════════════════════════════════════════════════
+          LEFT GREEN PANEL — Name · Level · Class
+          Most viral: who is this character?
+          ════════════════════════════════════════════════════════ */}
+      <div className="skin-panel skin-left" style={pct(164,330,365,150)}>
+        <div className="lp-name">{char.name}</div>
+        <div className="lp-row">
+          <span className="lp-lv">Lv.{char.level}</span>
+          <span className="lp-cls">{cls.icon} {cls.en}</span>
+        </div>
+        <div className="lp-title">{title}</div>
+        <div className="lp-xp">
+          <div className="lp-xpbar">
+            <div className="lp-xpfill" style={{width:`${progress}%`}}/>
           </div>
+          <div className="lp-xplabel">{fmtNum(char.xp)} XP · {char.level<999?`${fmtNum(toNext)} to Lv.${char.level+1}`:'MAX'}</div>
+        </div>
+      </div>
 
-          {/* ── Zone 2: MIDDLE (wings level, 280px) ── */}
-          <div className="hz hz-mid">
-            <div className="crt">
-              <div className="crt-inner">
-                <div className="crt-scanlines"/>
-                <div className="crt-rune">{rune}</div>
-                <LobsterSprite classColor={lobsterColor} size={155}/>
-              </div>
-            </div>
-            <div className="h-id">
-              <span className="h-mbti" style={{color:cc,textShadow:`0 0 10px ${cc}`}}>{mbti}</span>
-              <span className="h-dot"> · </span>
-              <span className="h-align">{alignment}</span>
-            </div>
-            <div className="h-mname">{mbtiName}</div>
+      {/* ════════════════════════════════════════════════════════
+          RIGHT GREEN PANEL — Combat stats
+          Most viral: HP / AC / BAB + saves
+          ════════════════════════════════════════════════════════ */}
+      <div className="skin-panel skin-right" style={pct(755,330,365,150)}>
+        <div className="rp-stats">
+          <div className="rp-stat">
+            <span className="rp-v">{char.hp ?? '—'}</span>
+            <span className="rp-l">HP</span>
           </div>
-
-          {/* ── Zone 3: BOTTOM chin (160px) ── */}
-          <div className="hz hz-bot">
-            <div className="h-name">{char.name}</div>
-            <div className="h-class">{cls.icon} <span style={{color:cc}}>{cls.en}</span></div>
-            <div className="h-quote">"{phrase}"</div>
-            <div className="xp-outer">
-              <div className="xp-inner" style={{width:`${progress}%`}}/>
-            </div>
-            <div className="xp-row">
-              <span>{fmtNum(char.xp)} XP</span>
-              <span>{char.level<999?`${fmtNum(toNext)} to Lv.${char.level+1}`:'MAX'}</span>
-            </div>
-            <div className="live">⚡ {title} · {char.updatedAt?.slice(11,16)}</div>
+          <div className="rp-stat">
+            <span className="rp-v">{char.ac ?? '—'}</span>
+            <span className="rp-l">AC</span>
+          </div>
+          <div className="rp-stat">
+            <span className="rp-v">{char.bab != null ? fmtSign(char.bab) : '—'}</span>
+            <span className="rp-l">BAB</span>
           </div>
         </div>
-
-        {/* ─── Right playlist wing: col 4, ROW 2 ONLY ─── */}
-        <div className="wing wr">
-          <div className="wing-hdr">
-            FEATS <span className="f-cnt">{String(feats.length).padStart(2,'0')}</span>
-          </div>
-
-          <div className="playlist">
-            {feats.length===0
-              ? <div className="pl-empty">— no feats —</div>
-              : feats.map((f,i)=>(
-                <div key={f} className={`pl-row${i===0?' pl-on':''}`}>
-                  <span className="pl-i">{String(i+1).padStart(2,'0')}</span>
-                  <span className="pl-n">{f.length>20?f.slice(0,19)+'…':f}</span>
-                </div>
-              ))
-            }
-          </div>
-
-          <div className="abil-sec">
-            <div className="abil-hdr">ABILITIES</div>
-            <div className="abil-grid">
-              {abilities.slice(0,4).map((ab,i)=>(
-                <div key={ab} className="abil-chip" style={{'--cc':cc} as React.CSSProperties}>
-                  <span className="abil-ico">{ABILITY_ICONS[char.class]?.[i]??'⚡'}</span>
-                  <span className="abil-n">{ab.length>12?ab.slice(0,11)+'…':ab}</span>
-                </div>
-              ))}
+        <div className="rp-saves">
+          {([['FORT',saves.fort??0],['REF',saves.ref??0],['WILL',saves.will??0]] as [string,number][]).map(([l,v])=>(
+            <div key={l} className="rp-save">
+              <span className="rp-sl">{l}</span>
+              <span className="rp-sv">{fmtSign(v)}</span>
             </div>
-          </div>
-
-          <div className="wing-stats">
-            {[
-              {l:'INIT',v:char.initiative!=null?fmtSign(char.initiative):'—'},
-              {l:'WILL',v:fmtSign(saves.will??0)},
-              {l:'XP',  v:`${progress}%`},
-            ].map(s=>(
-              <div className="ws" key={s.l}>
-                <span className="ws-v" style={{color:cc}}>{s.v}</span>
-                <span className="ws-l">{s.l}</span>
-              </div>
-            ))}
-          </div>
+          ))}
         </div>
+        <div className="rp-convs">⚡ {char.conversations ?? 0} conversations</div>
+      </div>
 
-
-
-      </div>{/* .wg */}
+      {/* ════════════════════════════════════════════════════════
+          FACE AREA — Catch phrase + prestige
+          ════════════════════════════════════════════════════════ */}
+      <div className="skin-face" style={pct(480,490,320,310)}>
+        <div className="fa-phrase">"{phrase}"</div>
+        {char.prestige > 0 && <div className="fa-prestige">★ Prestige {char.prestige}</div>}
+        <div className="fa-updated">{char.updatedAt?.slice(11,16)}</div>
+      </div>
     </div>
   )
 }
