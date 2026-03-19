@@ -155,17 +155,15 @@ function LobsterSprite({ classColor, size=160 }: { classColor:string; size?:numb
   )
 }
 
-// ── Alien Head SVG Shape ──────────────────────────────────────
-// Draws the full alien head with actual FACE FEATURES:
-// forehead dome → CRT zone → face (eyes + nose + chin)
+// ── Alien Head: real Winamp image + shield clip-path ─────────
+// The actual 3D alien face from the reference image is used as
+// the visual. An SVG shield outline is drawn on top.
 
 function AlienHeadShape({ color, width=300, height=550 }: { color:string; width?:number; height?:number }) {
   const w = width, h = height
 
-  // Shield silhouette:
-  // - Top: flat / square corners (like a heater shield)
-  // - Sides: straight down to ~68% height
-  // - Bottom: two curves converging to a pointed tip
+  // Shield silhouette (heater / heraldic shield):
+  // flat top → straight sides → curved converging to pointed tip
   const head = `
     M 0,0
     L ${w},0
@@ -177,68 +175,67 @@ function AlienHeadShape({ color, width=300, height=550 }: { color:string; width?
     Z
   `
 
+  // The Winamp image is ~800×550px.
+  // Alien head region starts at roughly x=270, width≈260px.
+  // We scale the image so the head fills our 300px-wide div.
+  // Scale factor = 300/260 ≈ 1.154  →  image renders as 924×635px
+  // Then shift left by 270*1.154 ≈ 312px to center on the head.
+  const imgW = 924
+  const imgH = 635
+  const imgOffX = -312
+
   return (
-    <svg
-      viewBox={`0 0 ${w} ${h}`}
-      xmlns="http://www.w3.org/2000/svg"
-      style={{ position:'absolute', inset:0, width:'100%', height:'100%', zIndex:0, overflow:'visible' }}
-    >
-      <defs>
-        {/* Radial gradient: slight class-color glow in middle, dark edges */}
-        <radialGradient id="hbg" cx="50%" cy="38%" r="60%">
-          <stop offset="0%"  stopColor={color} stopOpacity="0.12"/>
-          <stop offset="55%" stopColor="#0c0620" stopOpacity="1"/>
-          <stop offset="100%" stopColor="#060412" stopOpacity="1"/>
-        </radialGradient>
+    <div style={{ position:'absolute', inset:0, zIndex:0 }}>
 
-        {/* Face-zone gradient: slightly lighter so features are visible */}
-        <radialGradient id="facebg" cx="50%" cy="30%" r="70%">
-          <stop offset="0%"  stopColor={color} stopOpacity="0.08"/>
-          <stop offset="100%" stopColor="#070314" stopOpacity="1"/>
-        </radialGradient>
+      {/* ── Layer 1: Real Winamp alien face image, clipped to shield shape ── */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        clipPath: `path("${head.trim().replace(/\s+/g,' ')}")`,
+        overflow: 'hidden',
+      }}>
+        <img
+          src="/winamp-ref.jpg"
+          alt=""
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: imgOffX,
+            width:  imgW,
+            height: imgH,
+            imageRendering: 'auto',
+            /* Darken & desaturate to blend with dark theme */
+            filter: 'brightness(0.55) saturate(0.7)',
+          }}
+        />
+        {/* Dark vignette over image so content text remains readable */}
+        <div style={{
+          position:'absolute', inset:0,
+          background:'radial-gradient(ellipse at 50% 35%, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.65) 100%)',
+        }}/>
+      </div>
 
-        {/* Glow filter for outline */}
-        <filter id="hglow" x="-25%" y="-10%" width="150%" height="120%">
-          <feGaussianBlur stdDeviation="10" result="blur"/>
-          <feFlood floodColor={color} floodOpacity="0.7" result="c"/>
-          <feComposite in="c" in2="blur" operator="in" result="g"/>
-          <feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
-
-
-      </defs>
-
-      {/* ── 1. Head fill ── */}
-      <path d={head} fill="url(#hbg)"/>
-
-      {/* ── 2. Glowing border (most important visual) ── */}
-      <path d={head} fill="none" stroke={color} strokeWidth="2.5"
-        filter="url(#hglow)" opacity="0.95"/>
-
-      {/* ── 3. Inner shield bevel (1px inset of the border) ── */}
-      <path d={head} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="1"
-        transform={`translate(5,4) scale(${(w-10)/w},${(h-6)/h})`}/>
-
-      {/* ── 4. Central vertical dividing line (heraldic) ── */}
-      <line x1={w*0.5} y1={h*0.04} x2={w*0.5} y2={h*0.62}
-        stroke="rgba(255,255,255,0.07)" strokeWidth="1"/>
-
-      {/* ── 5. Horizontal dividing line (top quarter) ── */}
-      <line x1={w*0.04} y1={h*0.28} x2={w*0.96} y2={h*0.28}
-        stroke="rgba(255,255,255,0.06)" strokeWidth="1"/>
-
-      {/* ── 6. Top-left corner highlight (shield face catch light) ── */}
-      <ellipse cx={w*0.22} cy={h*0.09} rx={w*0.14} ry={h*0.06}
-        fill="rgba(255,255,255,0.05)"/>
-
-      {/* ── 7. Shield boss / umbo circle (center of lower half) ── */}
-      <circle cx={w*0.5} cy={h*0.48} r={w*0.07}
-        fill="none" stroke={color} strokeWidth="1" opacity="0.25"/>
-
-      {/* ── 8. Bottom point shadow ── */}
-      <ellipse cx={w*0.5} cy={h*0.97} rx={w*0.08} ry={h*0.018}
-        fill="rgba(0,0,0,0.5)"/>
-    </svg>
+      {/* ── Layer 2: Glowing shield border SVG (drawn OUTSIDE the clip) ── */}
+      <svg
+        viewBox={`0 0 ${w} ${h}`}
+        xmlns="http://www.w3.org/2000/svg"
+        style={{ position:'absolute', inset:0, width:'100%', height:'100%', overflow:'visible', zIndex:1 }}
+      >
+        <defs>
+          <filter id="hglow" x="-25%" y="-10%" width="150%" height="120%">
+            <feGaussianBlur stdDeviation="10" result="blur"/>
+            <feFlood floodColor={color} floodOpacity="0.75" result="c"/>
+            <feComposite in="c" in2="blur" operator="in" result="g"/>
+            <feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        {/* Outer glowing shield border */}
+        <path d={head} fill="none" stroke={color} strokeWidth="2.5"
+          filter="url(#hglow)" opacity="0.9"/>
+        {/* Inner bevel */}
+        <path d={head} fill="none" stroke="rgba(255,255,255,0.10)" strokeWidth="1"
+          transform={`translate(4,3) scale(${(w-8)/w},${(h-5)/h})`}/>
+      </svg>
+    </div>
   )
 }
 
