@@ -52,7 +52,74 @@ const STAT_INFO: Record<string, { en: string; icon: string; dnd: string }> = {
   charm:     { en: 'Charisma',     icon: '✨', dnd: 'CHA' },
 }
 
+const STAT_COLORS: Record<string, string> = {
+  claw:      '#ef4444',  // STR 紅
+  antenna:   '#22c55e',  // DEX 綠
+  shell:     '#f97316',  // CON 橘
+  brain:     '#3b82f6',  // INT 藍
+  foresight: '#eab308',  // WIS 黃
+  charm:     '#a855f7',  // CHA 紫
+}
+
 const STAT_KEYS = ['claw', 'antenna', 'shell', 'brain', 'foresight', 'charm']
+
+// ── WC3 新增常量 ──────────────────────────────────────────────
+
+function deriveMBTI(stats: Stats, bab: number): string {
+  const EI = stats.claw    > stats.brain     ? 'E' : 'I'  // STR vs INT
+  const SN = stats.charm   > stats.foresight ? 'S' : 'N'  // CHA vs WIS
+  const TF = stats.shell   > stats.antenna   ? 'T' : 'F'  // CON vs DEX
+  const JP = bab           > 5               ? 'J' : 'P'  // 高 BAB = 果斷
+  return EI + SN + TF + JP
+}
+
+const MBTI_NAMES: Record<string, string> = {
+  'INTJ':'The Architect',   'INTP':'The Logician',
+  'ENTJ':'The Commander',   'ENTP':'The Debater',
+  'INFJ':'The Advocate',    'INFP':'The Mediator',
+  'ENFJ':'The Protagonist', 'ENFP':'The Campaigner',
+  'ISTJ':'The Logistician', 'ISFJ':'The Defender',
+  'ESTJ':'The Executive',   'ESFJ':'The Consul',
+  'ISTP':'The Virtuoso',    'ISFP':'The Adventurer',
+  'ESTP':'The Entrepreneur','ESFP':'The Entertainer',
+}
+
+function deriveAlignment(stats: Stats): string {
+  const lc = stats.foresight + stats.shell  // WIS + CON
+  const ge = stats.charm + stats.foresight  // CHA + WIS
+  const law  = lc >= 26 ? 'Lawful'  : lc <= 18 ? 'Chaotic' : 'Neutral'
+  const good = ge >= 26 ? 'Good'    : ge <= 18 ? 'Evil'    : 'Neutral'
+  return (law === 'Neutral' && good === 'Neutral') ? 'True Neutral' : `${law} ${good}`
+}
+
+function getRarity(level: number): { label: string; color: string; glow: string } {
+  if (level >= 100) return { label: 'MYTHIC',    color: '#f0abfc', glow: 'rgba(240,171,252,0.5)' }
+  if (level >= 61)  return { label: 'LEGENDARY', color: '#fbbf24', glow: 'rgba(251,191,36,0.5)'  }
+  if (level >= 31)  return { label: 'EPIC',       color: '#a78bfa', glow: 'rgba(167,139,250,0.4)' }
+  if (level >= 16)  return { label: 'RARE',       color: '#60a5fa', glow: 'rgba(96,165,250,0.4)'  }
+  if (level >= 6)   return { label: 'UNCOMMON',   color: '#4ade80', glow: 'rgba(74,222,128,0.4)'  }
+  return                   { label: 'COMMON',     color: '#94a3b8', glow: 'rgba(148,163,184,0.3)' }
+}
+
+const CATCHPHRASES: Record<string, string> = {
+  barbarian: "Rage first. Think later. Win anyway.",
+  fighter:   "My claws have never missed. Not once.",
+  paladin:   "Justice is not a shield — it's a weapon.",
+  ranger:    "I was watching before you even walked in.",
+  cleric:    "The gods speak through me. Mostly in complaints.",
+  druid:     "The tide rises for all. Especially the foolish.",
+  monk:      "Still water. Deep current. Sharp claws.",
+  rogue:     "They never hear the second claw.",
+  bard:      "They'll write songs about this. Probably me.",
+  wizard:    "I have read seventeen books about this mistake.",
+  sorcerer:  "I didn't learn this power. I was born with it.",
+}
+
+const CLASS_RUNE: Record<string, string> = {
+  barbarian:'🪓', fighter:'⚔️', paladin:'🛡️', ranger:'🏹',
+  cleric:'✝️', druid:'🌿', monk:'👊', rogue:'🗡️',
+  bard:'🎭', wizard:'🧙', sorcerer:'🔮',
+}
 
 // ── Formulas ──────────────────────────────────────────────────
 
@@ -204,44 +271,69 @@ export default function App() {
   const feats      = char.feats ?? []
   const isClassFeat = (f: string) => /\[.+\]/.test(f)
 
+  // WC3 計算區
+  const mbti        = deriveMBTI(char.stats, char.bab ?? 0)
+  const mbtiName    = MBTI_NAMES[mbti] ?? ''
+  const alignment   = deriveAlignment(char.stats)
+  const rarity      = getRarity(char.level)
+  const catchphrase = CATCHPHRASES[char.class] ?? "Ready for anything."
+  const rune        = CLASS_RUNE[char.class] ?? '🦞'
+
   return (
     <div className="page-bg">
       <div className="card-wrap">
+        <div className="card" style={{
+          '--class-color': classColor,
+          '--rarity-color': rarity.color,
+          '--rarity-glow': rarity.glow,
+        } as React.CSSProperties}>
 
-        {/* 卡牌主體 */}
-        <div className="card" style={{ '--class-color': classColor } as React.CSSProperties}>
+          {/* ── 稀有度標籤（左上角）── */}
+          <div className="rarity-badge" style={{ color: rarity.color }}>
+            {rarity.label}
+          </div>
 
-          {/* 等級水晶 */}
+          {/* ── 等級水晶（右上角）── */}
           <div className="level-crystal">{char.level}</div>
 
-          {/* 姓名橫幅 */}
+          {/* ── 姓名橫幅 ── */}
           <div className="name-banner">
             <span className="name-text">{char.name}</span>
           </div>
 
-          {/* 插畫區 */}
+          {/* ── 插畫區（含職業圖騰水印 + SoulWeb）── */}
           <div className="portrait-frame">
-            <SoulWeb stats={char.stats} classColor={classColor} size={280} />
+            {/* WC3 風格：職業圖騰大符文，置於背景 */}
+            <div className="class-rune-bg">{rune}</div>
+            <SoulWeb stats={char.stats} classColor={classColor} size={260} />
           </div>
 
-          {/* 職業橫幅 */}
+          {/* ── 職業橫幅 ── */}
           <div className="class-banner">
             {cls.icon} {cls.en}
           </div>
 
-          {/* 描述框 */}
+          {/* ── MBTI + Alignment（身份標籤，傳播核心）── */}
+          <div className="identity-row">
+            <span className="mbti-badge">{mbti}</span>
+            <span className="mbti-name">· {mbtiName}</span>
+            <span className="alignment-badge">{alignment}</span>
+          </div>
+
+          {/* ── 描述框 ── */}
           <div className="desc-box">
 
-            {/* 六屬性行 */}
-            <div className="ability-row">
+            {/* WC3 風格六屬性：彩色色塊 + 數值 */}
+            <div className="stat-pips">
               {STAT_KEYS.map(k => {
                 const info = STAT_INFO[k]
-                const val  = char.stats[k as keyof Stats]
+                const val  = char.stats[k as keyof Stats] ?? 10
                 return (
-                  <div className="ability-cell" key={k}>
-                    <div className="ability-dnd" style={{ color: classColor }}>{info.dnd}</div>
-                    <div className="ability-num">{val}</div>
-                    <div className="ability-mod">{modStr(val)}</div>
+                  <div className="pip" key={k} style={{ '--pip-color': STAT_COLORS[k] } as React.CSSProperties}>
+                    <div className="pip-icon">{info.icon}</div>
+                    <div className="pip-val">{val}</div>
+                    <div className="pip-mod">{modStr(val)}</div>
+                    <div className="pip-dnd">{info.dnd}</div>
                   </div>
                 )
               })}
@@ -251,21 +343,27 @@ export default function App() {
 
             {/* 衍生數值 */}
             <div className="combat-row">
-              <span>AC <strong>{char.ac ?? '—'}</strong></span>
-              <span>Init <strong style={{ color: classColor }}>{fmtSign(char.initiative ?? 0)}</strong></span>
-              <span>Fort <strong>{fmtSign(char.saves?.fort ?? 0)}</strong></span>
-              <span>Ref <strong>{fmtSign(char.saves?.ref ?? 0)}</strong></span>
-              <span>Will <strong>{fmtSign(char.saves?.will ?? 0)}</strong></span>
+              {[
+                { l: 'HP',   v: char.hp           ?? '—' },
+                { l: 'AC',   v: char.ac            ?? '—' },
+                { l: 'Init', v: char.initiative != null ? fmtSign(char.initiative) : '—' },
+                { l: 'Fort', v: char.saves?.fort  != null ? fmtSign(char.saves.fort) : '—' },
+                { l: 'Ref',  v: char.saves?.ref   != null ? fmtSign(char.saves.ref)  : '—' },
+                { l: 'Will', v: char.saves?.will  != null ? fmtSign(char.saves.will) : '—' },
+              ].map(({l, v}) => (
+                <span key={l} className="combat-stat">
+                  <span className="combat-label">{l}</span>
+                  <strong className="combat-val">{v}</strong>
+                </span>
+              ))}
             </div>
 
             <div className="divider" />
 
             {/* 職業特性 */}
-            {char.abilities?.length > 0 && (
-              <div className="features-text">
-                {char.abilities.join(' · ')}
-              </div>
-            )}
+            <div className="features-text">
+              {char.abilities?.join(' · ')}
+            </div>
 
             {/* Feats 緊湊 */}
             {feats.length > 0 && (
@@ -273,11 +371,9 @@ export default function App() {
                 <span className="feats-label">Feats ({feats.length})</span>
                 <div className="feats-compact">
                   {feats.map(f => (
-                    <span
-                      key={f}
+                    <span key={f}
                       className={`feat-chip${isClassFeat(f) ? ' class' : ''}`}
-                      style={isClassFeat(f) ? { color: classColor } : {}}
-                    >
+                      style={isClassFeat(f) ? { color: classColor, borderColor: classColor + '60' } : {}}>
                       {f}
                     </span>
                   ))}
@@ -285,20 +381,29 @@ export default function App() {
               </div>
             )}
 
+            <div className="divider" />
+
+            {/* WC3 英雄台詞 */}
+            <div className="catchphrase">
+              <span className="cq-mark">❝</span>
+              <span className="cq-text">{catchphrase}</span>
+              <span className="cq-mark">❞</span>
+            </div>
+
           </div>{/* .desc-box */}
 
-          {/* 底部欄 */}
+          {/* ── 底部：BAB 寶石 / 稱號 / HP 寶石 ── */}
           <div className="card-footer">
-            {/* 攻擊寶石（左） */}
             <div className="gem gem-atk">
               <span className="gem-val">{char.bab != null ? fmtSign(char.bab) : '—'}</span>
               <span className="gem-label">BAB</span>
             </div>
-
-            {/* 中間稱號 */}
-            <div className="footer-title">{title}</div>
-
-            {/* 生命寶石（右） */}
+            <div className="footer-center">
+              <div className="footer-title">{title}</div>
+              <div className="footer-prestige">
+                {char.prestige > 0 && `✦ Prestige ${char.prestige}`}
+              </div>
+            </div>
             <div className="gem gem-hp">
               <span className="gem-val">{char.hp ?? '—'}</span>
               <span className="gem-label">HP</span>
@@ -307,19 +412,21 @@ export default function App() {
 
         </div>{/* .card */}
 
-        {/* XP 條（卡牌下方） */}
+        {/* XP 條（卡牌外） */}
         <div className="xp-bar-outer">
-          <div className="xp-bar-inner" style={{ width: `${progress}%`, background: classColor }} />
+          <div className="xp-bar-inner"
+            style={{ width: `${progress}%`, background: rarity.color }} />
         </div>
         <div className="xp-label-row">
           <span>{fmtNum(char.xp)} XP</span>
-          <span>{progress}% · {fmtNum(toNext)} to Lv.{char.level + 1}</span>
+          <span>
+            {char.level < 999
+              ? `${progress}% · ${fmtNum(toNext)} to Lv.${char.level + 1}`
+              : '🌟 Max Level!'}
+          </span>
         </div>
-
-        {/* 底部連接狀態 */}
-        <div className="live-badge">⚡ Live via SSE · {char.updatedAt?.slice(11, 16)} UTC</div>
-
-      </div>{/* .card-wrap */}
+        <div className="live-badge">⚡ Live · {char.updatedAt?.slice(11,16)} UTC</div>
+      </div>
     </div>
   )
 }

@@ -377,3 +377,187 @@ body {
   font-family: monospace;
   color: #94a3b8;
 }
+
+/* ══════════════════════════════════════════
+   WC3 Hero Card v3 - 新增樣式
+   ══════════════════════════════════════════ */
+
+/* ── 稀有度標籤（左上角）── */
+.rarity-badge {
+  position: absolute;
+  top: 10px;
+  left: 14px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-shadow: 0 0 8px currentColor;
+  z-index: 10;
+}
+
+/* ── 稀有度外層光暈疊加 ── */
+.card {
+  outline: 1px solid color-mix(in srgb, var(--rarity-color, transparent) 30%, transparent);
+}
+
+/* ── 職業圖騰水印（WC3 大圖示背景）── */
+.class-rune-bg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 140px;
+  opacity: 0.07;
+  line-height: 1;
+  pointer-events: none;
+  filter: blur(2px);
+  user-select: none;
+}
+
+/* ── MBTI + Alignment 行 ── */
+.identity-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 4px 20px 10px;
+  flex-wrap: wrap;
+}
+
+.mbti-badge {
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--class-color);
+  letter-spacing: 1px;
+  text-shadow: 0 0 12px var(--class-color);
+}
+
+.mbti-name {
+  font-size: 11px;
+  color: #64748b;
+  font-style: italic;
+}
+
+.alignment-badge {
+  font-size: 10px;
+  font-weight: 600;
+  color: #475569;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 2px 7px;
+  border-radius: 10px;
+  letter-spacing: 0.5px;
+}
+
+/* ── WC3 六屬性色塊（stat-pips）── */
+.stat-pips {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 5px;
+  margin-bottom: 2px;
+}
+
+.pip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 6px 3px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--pip-color) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--pip-color) 30%, transparent);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 底部光暈 */
+.pip::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 8px;
+  background: var(--pip-color);
+  filter: blur(6px);
+  opacity: 0.5;
+  border-radius: 50%;
+}
+
+.pip-icon { font-size: 13px; line-height: 1; }
+.pip-val  { font-size: 16px; font-weight: 900; color: #f1f5f9; line-height: 1; }
+.pip-mod  { font-size: 9px;  color: var(--pip-color); font-weight: 600; }
+.pip-dnd  { font-size: 8px;  color: #475569; letter-spacing: 0.5px; margin-top: 1px; }
+
+/* ── 衍生數值行（覆寫）── */
+.combat-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+
+.combat-label {
+  font-size: 9px;
+  color: #475569;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.combat-val {
+  font-size: 14px;
+  font-weight: 700;
+  color: #e2e8f0;
+}
+
+/* ── WC3 英雄台詞 ── */
+.catchphrase {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  padding: 6px 0 2px;
+}
+
+.cq-mark {
+  font-size: 18px;
+  color: var(--class-color);
+  opacity: 0.5;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.cq-text {
+  font-size: 12px;
+  color: #64748b;
+  font-style: italic;
+  line-height: 1.5;
+  flex: 1;
+}
+
+/* ── 底部中央（稱號 + prestige）── */
+.footer-center {
+  flex: 1;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 6px;
+  gap: 2px;
+}
+
+.footer-prestige {
+  font-size: 9px;
+  color: #fbbf24;
+  letter-spacing: 0.5px;
+}
+
+/* footer-title 在新結構下不需要 flex: 1 */
+.footer-center .footer-title {
+  flex: unset;
+  padding-bottom: 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  letter-spacing: 1px;
+}
