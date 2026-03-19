@@ -617,3 +617,200 @@ body {
 .mythic-rarity {
   animation: mythic-rainbow 2s steps(4) infinite !important;
 }
+
+/* ════════════════════════════════════════════════════════════
+   v4 重設計 — 像素龍蝦 / MBTI / 核心數值 / 職業能力
+   ════════════════════════════════════════════════════════════ */
+
+/* ── 龍蝦像素圖動畫 ─────────────────────── */
+.lobster-sprite {
+  display: block;
+  margin: 8px auto 4px;
+  animation: lobster-breathe 3s ease-in-out infinite;
+  transform-origin: center bottom;
+}
+@keyframes lobster-breathe {
+  0%, 100% { transform: scaleY(1); }
+  50%       { transform: scaleY(1.04); }
+}
+/* 眼睛眨眼動畫 */
+.lobster-eye {
+  animation: eye-blink 5s steps(1) infinite;
+}
+@keyframes eye-blink {
+  0%, 88%, 100% { opacity: 1; }
+  90%, 96%      { opacity: 0; }
+}
+
+/* ── MBTI 區塊 ─────────────────────────── */
+.mbti-section {
+  text-align: center;
+  padding: 6px 0 4px;
+}
+.mbti-code {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 20px;
+  letter-spacing: 4px;
+  line-height: 1.2;
+  display: block;
+}
+.mbti-sub {
+  margin-top: 6px;
+  font-family: monospace, sans-serif;
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.4;
+}
+.mbti-name-text { color: #94a3b8; }
+.mbti-dot       { color: #475569; }
+.alignment-text { color: #64748b; }
+
+/* ── 名言區塊 ───────────────────────────── */
+.quote-section {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 4px 0;
+}
+.cq-mark {
+  font-size: 20px;
+  color: var(--class-color);
+  opacity: 0.5;
+  flex-shrink: 0;
+  line-height: 1.1;
+}
+.cq-text {
+  font-family: monospace, sans-serif;
+  font-size: 12px;
+  color: #64748b;
+  font-style: italic;
+  line-height: 1.7;
+  flex: 1;
+}
+
+/* ── 核心數值 ────────────────────────────── */
+.key-stats-section { padding: 2px 0; }
+
+.ks-row {
+  display: flex;
+  justify-content: space-around;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+.ks-row.ks-saves { justify-content: center; gap: 32px; }
+
+.ks-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  flex: 1;
+}
+.ks-cell.wide { flex: 1.2; }
+
+.ks-val {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 14px;
+  color: #f1f5f9;
+  line-height: 1;
+}
+
+.ks-label {
+  font-family: monospace, sans-serif;
+  font-size: 11px;
+  color: #475569;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* ── 職業能力圖標（4格）───────────────── */
+.ability-icons-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  padding: 2px 0;
+}
+
+.ab-icon-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 4px 6px;
+  border: 1px solid;
+  border-radius: 0;
+  clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 0 100%, 0 4px);
+  text-align: center;
+}
+
+.ab-icon-emoji {
+  font-size: 18px;
+  line-height: 1;
+  display: block;
+}
+
+.ab-icon-name {
+  font-family: monospace, sans-serif;
+  font-size: 9px;
+  line-height: 1.3;
+  text-align: center;
+  word-break: break-word;
+  hyphens: auto;
+  display: block;
+}
+
+/* ── 六屬性小行 ──────────────────────────── */
+.mini-stat-row {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 4px;
+}
+
+.mini-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 5px 2px;
+  background: color-mix(in srgb, var(--pip-color) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--pip-color) 30%, transparent);
+  border-radius: 0;
+}
+
+.ms-val {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  color: #f1f5f9;
+  line-height: 1;
+}
+.ms-mod {
+  font-family: monospace, sans-serif;
+  font-size: 10px;
+  color: var(--pip-color);
+  line-height: 1;
+}
+.ms-label {
+  font-family: monospace, sans-serif;
+  font-size: 9px;
+  color: #475569;
+  letter-spacing: 0;
+}
+
+/* ── 覆寫：XP 標籤改用 monospace ──────────── */
+.xp-label-row {
+  font-family: monospace, sans-serif !important;
+  font-size: 11px !important;
+  color: #334155;
+  margin-top: 5px;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* ── 覆寫：live-badge ─────────────────────── */
+.live-badge {
+  font-family: monospace, sans-serif !important;
+  font-size: 10px !important;
+  color: #1e293b;
+  text-align: center;
+  margin-top: 6px;
+}

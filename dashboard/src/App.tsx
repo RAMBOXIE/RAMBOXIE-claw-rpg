@@ -121,6 +121,106 @@ const CLASS_RUNE: Record<string, string> = {
   bard:'🎭', wizard:'🧙', sorcerer:'🔮',
 }
 
+const ABILITY_ICONS: Record<string, string[]> = {
+  barbarian: ['💢','⚡','🔥','🔱'],
+  fighter:   ['⚔️','🗡️','🏟️','🛡️'],
+  paladin:   ['☀️','✨','🛡️','⚜️'],
+  ranger:    ['🏹','🌲','💨','🦅'],
+  cleric:    ['✝️','💀','🌟','👼'],
+  druid:     ['🌿','🐺','🌊','🌀'],
+  monk:      ['👊','💨','🧘','☯️'],
+  rogue:     ['🗡️','👁️','💎','☠️'],
+  bard:      ['🎵','💬','🎭','📖'],
+  wizard:    ['🔮','📚','⚡','👁️'],
+  sorcerer:  ['🐉','💫','⚡','🌀'],
+}
+
+// ── 像素龍蝦數據 ───────────────────────────────────────────────
+
+const LOBSTER_PIXELS: [number, number, string][] = [
+  // 觸角 (A = antenna)
+  [3,0,'A'],[8,0,'A'],
+  [2,1,'A'],[9,1,'A'],
+  [1,2,'A'],[10,2,'A'],
+  // 頭部 (H = head = classColor)
+  [4,3,'H'],[5,3,'H'],[6,3,'H'],[7,3,'H'],
+  [3,4,'H'],[5,4,'H'],[6,4,'H'],[8,4,'H'],
+  [3,5,'H'],[4,5,'H'],[5,5,'H'],[6,5,'H'],[7,5,'H'],[8,5,'H'],
+  // 眼睛 (W = white)
+  [4,4,'W'],[7,4,'W'],
+  // 螯 (C = claw = classColor, opacity 0.75)
+  [2,4,'C'],[9,4,'C'],
+  [1,5,'C'],[2,5,'C'],[9,5,'C'],[10,5,'C'],
+  [0,6,'C'],[1,6,'C'],[10,6,'C'],[11,6,'C'],
+  [0,7,'C'],[1,7,'C'],[10,7,'C'],[11,7,'C'],
+  [1,8,'C'],[10,8,'C'],
+  // 身體 (B = body = classColor)
+  [3,6,'H'],[8,6,'H'],
+  [4,6,'B'],[5,6,'B'],[6,6,'B'],[7,6,'B'],
+  [4,7,'B'],[5,7,'B'],[6,7,'B'],[7,7,'B'],
+  [4,8,'B'],[5,8,'B'],[6,8,'B'],[7,8,'B'],
+  [4,9,'B'],[5,9,'B'],[6,9,'B'],[7,9,'B'],
+  // 尾扇 (T = tail = classColor, opacity 0.85)
+  [3,10,'T'],[4,10,'T'],[5,10,'T'],[6,10,'T'],[7,10,'T'],[8,10,'T'],
+  [2,11,'T'],[3,11,'T'],[5,11,'T'],[6,11,'T'],[8,11,'T'],[9,11,'T'],
+  [1,12,'T'],[2,12,'T'],[5,12,'T'],[6,12,'T'],[9,12,'T'],[10,12,'T'],
+  [0,13,'T'],[1,13,'T'],[10,13,'T'],[11,13,'T'],
+  // 高光 (X = highlight rgba(255,255,255,0.25))
+  [5,3,'X'],[4,5,'X'],
+]
+
+// ── LobsterSprite 組件 ────────────────────────────────────────
+
+interface LobsterSpriteProps { classColor: string; size?: number }
+
+function LobsterSprite({ classColor, size = 192 }: LobsterSpriteProps) {
+  const COLS = 12, ROWS = 14
+  const px = size / COLS
+
+  const colorMap: Record<string, string> = {
+    A: '#94a3b8',
+    H: classColor,
+    W: '#ffffff',
+    C: classColor,
+    B: classColor,
+    T: classColor,
+    X: 'rgba(255,255,255,0.25)',
+  }
+  const opacityMap: Record<string, number> = {
+    A: 0.9, H: 1, W: 1, C: 0.72, B: 1, T: 0.82, X: 1
+  }
+
+  return (
+    <svg
+      width={size} height={ROWS * px}
+      viewBox={`0 0 ${size} ${ROWS * px}`}
+      style={{ imageRendering: 'pixelated', display: 'block', margin: '0 auto' }}
+      className="lobster-sprite"
+    >
+      <defs>
+        <filter id="lobster-glow" x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feFlood floodColor={classColor} floodOpacity="0.5" result="color"/>
+          <feComposite in="color" in2="blur" operator="in" result="glow"/>
+          <feMerge><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <g filter="url(#lobster-glow)">
+        {LOBSTER_PIXELS.map(([col, row, type], i) => (
+          <rect
+            key={i}
+            x={col * px} y={row * px}
+            width={px} height={px}
+            fill={colorMap[type] ?? classColor}
+            opacity={opacityMap[type] ?? 1}
+            className={type === 'W' ? 'lobster-eye' : undefined}
+          />
+        ))}
+      </g>
+    </svg>
+  )
+}
+
 // ── Formulas ──────────────────────────────────────────────────
 
 function xpForLevel(n: number): number {
@@ -141,7 +241,7 @@ function modStr(val: number): string { const m = mod(val); return (m >= 0 ? '+' 
 function fmtNum(n: number): string { return n.toLocaleString() }
 function fmtSign(n: number): string { return (n >= 0 ? '+' : '') + n }
 
-// ── SoulWeb SVG Component ──────────────────────────────────────
+// ── SoulWeb SVG Component（保留定義，不使用）─────────────────
 
 interface SoulWebProps { stats: Stats; classColor: string; size?: number }
 
@@ -186,26 +286,18 @@ function SoulWeb({ stats, classColor, size = 280 }: SoulWebProps) {
           <feMerge><feMergeNode in="glow" /><feMergeNode in="SourceGraphic" /></feMerge>
         </filter>
       </defs>
-
-      {/* Grid rings */}
       {[0.25, 0.5, 0.75, 1.0].map(f => (
         <path key={f} d={hexPath(f)} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={1} />
       ))}
-
-      {/* Axis lines */}
       {STAT_KEYS.map((_, i) => {
         const ang = angles[i] * (Math.PI / 180)
         return <line key={i} x1={cx} y1={cy}
           x2={cx + R * Math.cos(ang)} y2={cy + R * Math.sin(ang)}
           stroke="rgba(255,255,255,0.1)" strokeWidth={1} />
       })}
-
-      {/* Data polygon */}
       <path d={dataPath()} fill={classColor} fillOpacity={0.25}
         stroke={classColor} strokeWidth={2}
         className="soul-web-polygon" filter="url(#soul-glow)" />
-
-      {/* Labels */}
       {STAT_KEYS.map((key, i) => {
         const [lx, ly] = labelPos(i)
         const info = STAT_INFO[key]
@@ -221,7 +313,6 @@ function SoulWeb({ stats, classColor, size = 280 }: SoulWebProps) {
           </g>
         )
       })}
-
       <circle cx={cx} cy={cy} r={3} fill={classColor} />
     </svg>
   )
@@ -268,8 +359,6 @@ export default function App() {
   const title      = TITLES[Math.min(char.prestige, TITLES.length - 1)]
   const progress   = levelProgress(char.xp, char.level)
   const toNext     = xpToNext(char.xp, char.level)
-  const feats      = char.feats ?? []
-  const isClassFeat = (f: string) => /\[.+\]/.test(f)
 
   // WC3 計算區
   const mbti        = deriveMBTI(char.stats, char.bab ?? 0)
@@ -278,6 +367,9 @@ export default function App() {
   const rarity      = getRarity(char.level)
   const catchphrase = CATCHPHRASES[char.class] ?? "Ready for anything."
   const rune        = CLASS_RUNE[char.class] ?? '🦞'
+
+  // 抑制 SoulWeb 未使用警告（保留定義但不渲染）
+  void (SoulWeb as unknown)
 
   return (
     <div className="page-bg">
@@ -288,114 +380,117 @@ export default function App() {
           '--rarity-glow': rarity.glow,
         } as React.CSSProperties}>
 
-          {/* ── 稀有度標籤（左上角）── */}
-          <div
-            className={`rarity-badge${rarity.label === 'MYTHIC' ? ' mythic-rarity' : ''}`}
-            style={{ color: rarity.color }}
-          >
-            {rarity.label}
-          </div>
+          {/* 稀有度 */}
+          <div className={`rarity-badge${rarity.label === 'MYTHIC' ? ' mythic-rarity' : ''}`}
+            style={{ color: rarity.color }}>{rarity.label}</div>
 
-          {/* ── 等級水晶（右上角）── */}
+          {/* 等級水晶 */}
           <div className="level-crystal">{char.level}</div>
 
-          {/* ── 姓名橫幅 ── */}
+          {/* 姓名橫幅 */}
           <div className="name-banner">
             <span className="name-text">{char.name}</span>
           </div>
 
-          {/* ── 插畫區（含職業圖騰水印 + SoulWeb）── */}
+          {/* 像素龍蝦（替換雷達圖）*/}
           <div className="portrait-frame">
-            {/* WC3 風格：職業圖騰大符文，置於背景 */}
             <div className="class-rune-bg">{rune}</div>
-            <SoulWeb stats={char.stats} classColor={classColor} size={250} />
+            <LobsterSprite classColor={classColor} size={192} />
           </div>
 
-          {/* ── 職業橫幅 ── */}
-          <div className="class-banner">
-            {cls.icon} {cls.en}
-          </div>
+          {/* 職業橫幅 */}
+          <div className="class-banner">{cls.icon} {cls.en}</div>
 
-          {/* ── MBTI + Alignment（身份標籤，傳播核心）── */}
-          <div className="identity-row">
-            <span className="mbti-badge">{mbti}</span>
-            <span className="mbti-name">· {mbtiName}</span>
-            <span className="alignment-badge">{alignment}</span>
-          </div>
-
-          {/* ── 描述框 ── */}
+          {/* 描述框 */}
           <div className="desc-box">
 
-            {/* WC3 風格六屬性：彩色色塊 + 數值 */}
-            <div className="stat-pips">
-              {STAT_KEYS.map(k => {
-                const info = STAT_INFO[k]
-                const val  = char.stats[k as keyof Stats] ?? 10
-                return (
-                  <div className="pip" key={k} style={{ '--pip-color': STAT_COLORS[k] } as React.CSSProperties}>
-                    <div className="pip-icon">{info.icon}</div>
-                    <div className="pip-val">{val}</div>
-                    <div className="pip-mod">{modStr(val)}</div>
-                    <div className="pip-dnd">{info.dnd}</div>
-                  </div>
-                )
-              })}
-            </div>
-
-            <div className="divider" />
-
-            {/* 衍生數值 */}
-            <div className="combat-row">
-              {[
-                { l: 'HP',   v: char.hp           ?? '—' },
-                { l: 'AC',   v: char.ac            ?? '—' },
-                { l: 'Init', v: char.initiative != null ? fmtSign(char.initiative) : '—' },
-                { l: 'Fort', v: char.saves?.fort  != null ? fmtSign(char.saves.fort) : '—' },
-                { l: 'Ref',  v: char.saves?.ref   != null ? fmtSign(char.saves.ref)  : '—' },
-                { l: 'Will', v: char.saves?.will  != null ? fmtSign(char.saves.will) : '—' },
-              ].map(({l, v}) => (
-                <span key={l} className="combat-stat">
-                  <span className="combat-label">{l}</span>
-                  <strong className="combat-val">{v}</strong>
-                </span>
-              ))}
-            </div>
-
-            <div className="divider" />
-
-            {/* 職業特性 */}
-            <div className="features-text">
-              {char.abilities?.join(' · ')}
-            </div>
-
-            {/* Feats 緊湊 */}
-            {feats.length > 0 && (
-              <div className="feats-section">
-                <span className="feats-label">Feats ({feats.length})</span>
-                <div className="feats-compact">
-                  {feats.map(f => (
-                    <span key={f}
-                      className={`feat-chip${isClassFeat(f) ? ' class' : ''}`}
-                      style={isClassFeat(f) ? { color: classColor, borderColor: classColor + '60' } : {}}>
-                      {f}
-                    </span>
-                  ))}
-                </div>
+            {/* 1. MBTI */}
+            <div className="mbti-section">
+              <div className="mbti-code" style={{ color: classColor,
+                textShadow: `0 0 12px ${classColor}, 0 0 30px ${classColor}` }}>
+                {mbti}
               </div>
-            )}
+              <div className="mbti-sub">
+                <span className="mbti-name-text">{mbtiName}</span>
+                <span className="mbti-dot"> · </span>
+                <span className="alignment-text">{alignment}</span>
+              </div>
+            </div>
 
             <div className="divider" />
 
-            {/* WC3 英雄台詞 */}
-            <div className="catchphrase">
+            {/* 2. 名言 */}
+            <div className="quote-section">
               <span className="cq-mark">❝</span>
               <span className="cq-text">{catchphrase}</span>
               <span className="cq-mark">❞</span>
             </div>
 
+            <div className="divider" />
+
+            {/* 3. 核心數值 */}
+            <div className="key-stats-section">
+              <div className="ks-row">
+                {[
+                  { l: 'HP',   v: char.hp   ?? '—' },
+                  { l: 'AC',   v: char.ac   ?? '—' },
+                  { l: 'BAB',  v: char.bab  != null ? fmtSign(char.bab) : '—' },
+                  { l: 'INIT', v: char.initiative != null ? fmtSign(char.initiative) : '—' },
+                ].map(s => (
+                  <div className="ks-cell" key={s.l}>
+                    <div className="ks-val" style={{ color: classColor,
+                      textShadow: `0 0 8px ${classColor}` }}>{String(s.v)}</div>
+                    <div className="ks-label">{s.l}</div>
+                  </div>
+                ))}
+              </div>
+              <div className="ks-row ks-saves">
+                {[
+                  { l: 'FORT', v: char.saves?.fort != null ? fmtSign(char.saves.fort) : '—' },
+                  { l: 'REF',  v: char.saves?.ref  != null ? fmtSign(char.saves.ref)  : '—' },
+                  { l: 'WILL', v: char.saves?.will != null ? fmtSign(char.saves.will) : '—' },
+                ].map(s => (
+                  <div className="ks-cell wide" key={s.l}>
+                    <div className="ks-val">{s.v}</div>
+                    <div className="ks-label">{s.l}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="divider" />
+
+            {/* 4. 職業能力圖標 */}
+            <div className="ability-icons-grid">
+              {(char.abilities ?? []).map((ab, i) => (
+                <div className="ab-icon-chip" key={ab}
+                  style={{ borderColor: classColor + '60', background: classColor + '18' }}>
+                  <span className="ab-icon-emoji">{ABILITY_ICONS[char.class]?.[i] ?? '⚡'}</span>
+                  <span className="ab-icon-name" style={{ color: classColor }}>{ab}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="divider" />
+
+            {/* 5. 六屬性小行 */}
+            <div className="mini-stat-row">
+              {STAT_KEYS.map(k => {
+                const val = char.stats[k as keyof Stats] ?? 10
+                return (
+                  <div className="mini-stat" key={k}
+                    style={{ '--pip-color': STAT_COLORS[k] } as React.CSSProperties}>
+                    <div className="ms-val">{val}</div>
+                    <div className="ms-mod">{modStr(val)}</div>
+                    <div className="ms-label">{STAT_INFO[k].dnd}</div>
+                  </div>
+                )
+              })}
+            </div>
+
           </div>{/* .desc-box */}
 
-          {/* ── 底部：BAB 寶石 / 稱號 / HP 寶石 ── */}
+          {/* 底部寶石 */}
           <div className="card-footer">
             <div className="gem gem-atk">
               <span className="gem-val">{char.bab != null ? fmtSign(char.bab) : '—'}</span>
@@ -403,9 +498,9 @@ export default function App() {
             </div>
             <div className="footer-center">
               <div className="footer-title">{title}</div>
-              <div className="footer-prestige">
-                {char.prestige > 0 && `✦ Prestige ${char.prestige}`}
-              </div>
+              {char.prestige > 0 && (
+                <div className="footer-prestige">✦ Prestige {char.prestige}</div>
+              )}
             </div>
             <div className="gem gem-hp">
               <span className="gem-val">{char.hp ?? '—'}</span>
@@ -415,13 +510,10 @@ export default function App() {
 
         </div>{/* .card */}
 
-        {/* XP 條（卡牌外） */}
+        {/* XP 條 */}
         <div className="xp-bar-outer">
           <div className="xp-bar-inner"
-            style={{
-              width: `${progress}%`,
-              '--bar-color': rarity.color,
-            } as React.CSSProperties} />
+            style={{ width: `${progress}%`, '--bar-color': rarity.color } as React.CSSProperties} />
         </div>
         <div className="xp-label-row">
           <span>{fmtNum(char.xp)} XP</span>
@@ -432,6 +524,7 @@ export default function App() {
           </span>
         </div>
         <div className="live-badge">⚡ Live · {char.updatedAt?.slice(11,16)} UTC</div>
+
       </div>
     </div>
   )
