@@ -10,7 +10,7 @@ Your AI assistant is now a **lobster adventurer** running on **standard D&D 3.5 
 
 ## Dashboard Preview
 
-![Claw RPG Soul Web Dashboard](docs/screenshots/dashboard-v2.1.0.jpg)
+![Claw RPG Soul Web Dashboard](https://raw.githubusercontent.com/RAMBOXIE/RAMBOXIE-claw-rpg/main/docs/screenshots/dashboard-v2.1.0.jpg)
 
 *Soul Web — hexagonal ability radar with class-themed glow, live derived stats (HP/AC/BAB/saves), and real-time SSE push.*
 
