@@ -323,6 +323,7 @@ export default function App() {
 
         {/* ─── Left EQ wing: col 2, ROW 2 ONLY ─── */}
         <div className="wing wl">
+          <div className="axe-handle"/>
           <div className="wing-hdr">EQUALIZER</div>
 
           <div className="eq-bars">
@@ -428,6 +429,7 @@ export default function App() {
 
         {/* ─── Right playlist wing: col 4, ROW 2 ONLY ─── */}
         <div className="wing wr">
+          <div className="axe-handle"/>
           <div className="wing-hdr">
             FEATS <span className="f-cnt">{String(feats.length).padStart(2,'0')}</span>
           </div>

@@ -45,13 +45,21 @@ body {
    Wings: col 2 & 4, ROW 2 ONLY
    Plain dark rectangles — no clip-path, no shapes
    ────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════
+   WING PANELS — plain rectangles, NO clip-path
+   Content must be fully visible.
+   Axe effect comes from: handle pole extending above/below
+   + outer-edge blade gradient + drop-shadow glow.
+   ══════════════════════════════════════════════════════════ */
+
 .wing {
-  background: linear-gradient(180deg, #1a1232 0%, #0e0a1e 50%, #0a0618 100%);
   position: relative;
-  overflow: visible; /* allow drop-shadow glow to bleed */
+  overflow: visible;         /* critical: lets handle overflow the grid cell */
   display: flex;
   flex-direction: column;
-  /* axe blade shapes applied per-side below */
+  border: 1px solid #2a2248;
+  border-top: 1px solid #3a2a5a;
+  border-bottom: 1px solid #1a1230;
 }
 /* Scan-line texture */
 .wing::after {
@@ -59,50 +67,88 @@ body {
   position: absolute; inset: 0;
   background: repeating-linear-gradient(0deg,
     transparent 0px, transparent 3px,
-    rgba(0,0,0,0.07) 3px, rgba(0,0,0,0.07) 4px);
-  pointer-events: none;
-  z-index: 1;
+    rgba(0,0,0,0.06) 3px, rgba(0,0,0,0.06) 4px);
+  pointer-events: none; z-index: 1;
 }
 
-/* ── Left axe wing ──────────────────────────────────────────
-   Shape: crescent/axe blade pointing LEFT
-   Right edge (x=230): straight, flush against the shield
-   Left outer edge: curves out — widest at mid-height (y=140)
-   Top/bottom blade tips narrow back in                      */
+/* ── Left wing: blade face gradient (outer left = cutting edge) ── */
 .wl {
-  grid-column: 1;
-  grid-row: 2;
-  clip-path: path('M 230,0 L 60,0 Q 0,50 0,140 Q 0,230 60,280 L 230,280 Z');
-  filter: drop-shadow(3px 0 12px color-mix(in srgb, var(--cc, #14b8a6) 60%, transparent));
+  grid-column: 1; grid-row: 2;
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--cc,#14b8a6) 18%, #111) 0%,
+    #16122a 18%,
+    #0e0a1e 55%,
+    #0b0818 100%);
+  border-right: 2px solid var(--cc, #14b8a6);
+  border-left: none;
+  filter: drop-shadow(-4px 0 16px color-mix(in srgb, var(--cc,#14b8a6) 55%, transparent));
 }
-
-/* ── Right axe wing ─────────────────────────────────────────
-   Mirror of left                                             */
+/* ── Right wing: mirror ── */
 .wr {
-  grid-column: 3;
-  grid-row: 2;
-  clip-path: path('M 0,0 L 170,0 Q 230,50 230,140 Q 230,230 170,280 L 0,280 Z');
-  filter: drop-shadow(-3px 0 12px color-mix(in srgb, var(--cc, #14b8a6) 60%, transparent));
+  grid-column: 3; grid-row: 2;
+  background: linear-gradient(270deg,
+    color-mix(in srgb, var(--cc,#14b8a6) 18%, #111) 0%,
+    #16122a 18%,
+    #0e0a1e 55%,
+    #0b0818 100%);
+  border-left: 2px solid var(--cc, #14b8a6);
+  border-right: none;
+  filter: drop-shadow(4px 0 16px color-mix(in srgb, var(--cc,#14b8a6) 55%, transparent));
 }
 
-/* Outer cutting-edge highlight on each axe blade */
-.wl::before, .wr::before {
+/* ══════════════════════════════════════════════════════════
+   AXE HANDLE — vertical metallic pole that extends 110px
+   ABOVE the wing (into row-1 empty space) and 160px BELOW
+   (into row-3 empty space).  It sits at the OUTER edge of
+   each wing panel so it looks like a weapon handle.
+   ══════════════════════════════════════════════════════════ */
+.axe-handle {
+  /* Extends above & below the wing div */
+  position: absolute;
+  top:    -110px;
+  /* total = 110 (row1) + 280 (row2) + 160 (row3) = 550 */
+  height: 550px;
+  width:  16px;
+  border-radius: 4px;
+  /* metallic rod gradient (horizontal cross-section) */
+  background: linear-gradient(90deg,
+    #0c0a1a  0%,
+    #3a3858 15%,
+    #7878a0 30%,
+    #b4b4d0 46%,
+    #d8d8f0 50%,
+    #b4b4d0 54%,
+    #7878a0 70%,
+    #3a3858 85%,
+    #0c0a1a 100%);
+  border: 1px solid rgba(200,200,220,0.20);
+  box-shadow:
+    0 0 6px rgba(0,0,0,0.9),
+    inset 0 0 4px rgba(255,255,255,0.08);
+  z-index: 20;
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+/* Position handle at OUTER edge of each wing */
+.wl .axe-handle { left:  18px; }
+.wr .axe-handle { right: 18px; }
+
+/* Handle end-caps (small knobs at top & bottom) */
+.axe-handle::before,
+.axe-handle::after {
   content: '';
   position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 2;
-}
-.wl::before {
+  left: -3px;
+  width: calc(100% + 6px);
+  height: 14px;
   background: linear-gradient(90deg,
-    color-mix(in srgb, var(--cc, #14b8a6) 20%, transparent) 0%,
-    transparent 35%);
+    #1a1830, #aaaacc 40%, #e0e0f8 50%, #aaaacc 60%, #1a1830);
+  border-radius: 4px;
+  border: 1px solid rgba(220,220,255,0.25);
 }
-.wr::before {
-  background: linear-gradient(270deg,
-    color-mix(in srgb, var(--cc, #14b8a6) 20%, transparent) 0%,
-    transparent 35%);
-}
+.axe-handle::before { top: 0;    }
+.axe-handle::after  { bottom: 0; }
 
 .wing-hdr {
   font-size: 8px;
