@@ -1,22 +1,78 @@
 import express from 'express';
 import cors from 'cors';
-import { readFileSync, existsSync } from 'fs';
+import { readFileSync, existsSync, watch } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
+const CHARACTER_FILE = join(ROOT, 'character.json');
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-app.get('/api/character', (_req, res) => {
-  const file = join(ROOT, 'character.json');
-  if (!existsSync(file)) {
-    return res.status(404).json({ error: 'No character found. Run: node scripts/init.mjs' });
+// ── SSE 客戶端管理 ───────────────────────────────────────────
+const clients = new Set();
+
+function readChar() {
+  if (!existsSync(CHARACTER_FILE)) return null;
+  try { return JSON.parse(readFileSync(CHARACTER_FILE, 'utf8')); }
+  catch { return null; }
+}
+
+function broadcast(data) {
+  const msg = `data: ${JSON.stringify(data)}\n\n`;
+  for (const res of clients) {
+    try { res.write(msg); }
+    catch { clients.delete(res); }
   }
-  res.json(JSON.parse(readFileSync(file, 'utf8')));
+}
+
+// 監聽 character.json 變化，debounce 200ms 避免重複觸發
+let debounceTimer = null;
+if (existsSync(CHARACTER_FILE)) {
+  watch(CHARACTER_FILE, () => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      const char = readChar();
+      if (char) broadcast(char);
+    }, 200);
+  });
+}
+
+// ── API ──────────────────────────────────────────────────────
+app.get('/api/character', (_req, res) => {
+  const char = readChar();
+  if (!char) return res.status(404).json({ error: 'No character found. Run: node scripts/init.mjs' });
+  res.json(char);
+});
+
+// SSE 端點：客戶端訂閱實時更新
+app.get('/api/events', (req, res) => {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.flushHeaders();
+
+  // 立即推送當前數據
+  const char = readChar();
+  if (char) res.write(`data: ${JSON.stringify(char)}\n\n`);
+
+  // 加入廣播列表
+  clients.add(res);
+
+  // 心跳（每 25s 防止連接超時）
+  const heartbeat = setInterval(() => {
+    try { res.write(': ping\n\n'); }
+    catch { clearInterval(heartbeat); clients.delete(res); }
+  }, 25000);
+
+  req.on('close', () => {
+    clearInterval(heartbeat);
+    clients.delete(res);
+  });
 });
 
 app.get('/api/arena', (_req, res) => {
@@ -32,6 +88,7 @@ app.get('/{*path}', (_req, res) => {
 });
 
 const PORT = process.env.PORT || 3500;
-app.listen(PORT, () => {
-  console.log(`\n🦞 Claw RPG Dashboard → http://localhost:${PORT}\n`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`\n🦞 Claw RPG Dashboard → http://localhost:${PORT}`);
+  console.log(`   LAN access       → http://192.168.0.145:${PORT}\n`);
 });

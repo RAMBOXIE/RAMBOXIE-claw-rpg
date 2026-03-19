@@ -228,18 +228,24 @@ export default function App() {
   const [error, setError]     = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
-  const fetchChar = () => {
+  useEffect(() => {
+    // 初始加載
     fetch('/api/character')
       .then(r => r.ok ? r.json() : Promise.reject(r.statusText))
       .then(d => { setChar(d); setError(null) })
       .catch(e => setError(String(e)))
       .finally(() => setLoading(false))
-  }
 
-  useEffect(() => {
-    fetchChar()
-    const t = setInterval(fetchChar, 30000)
-    return () => clearInterval(t)
+    // SSE 實時訂閱：character.json 有變化立即推送
+    const es = new EventSource('/api/events')
+    es.onmessage = (e) => {
+      try {
+        const d = JSON.parse(e.data)
+        setChar(d); setError(null); setLoading(false)
+      } catch {}
+    }
+    es.onerror = () => { /* 斷線自動重連，無需處理 */ }
+    return () => es.close()
   }, [])
 
   if (loading) return (
