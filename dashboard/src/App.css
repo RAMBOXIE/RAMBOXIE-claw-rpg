@@ -130,9 +130,10 @@ body {
   flex-shrink: 0;
 }
 
-/* Position handle at OUTER edge of each wing */
-.wl .axe-handle { left:  18px; }
-.wr .axe-handle { right: 18px; }
+/* Handle sits RIGHT AT the outer edge of the wing, so the blade SVG
+   (which starts at the wing edge) appears to be mounted on the handle */
+.wl .axe-handle { left:  -8px; }   /* centered at left edge of wing  */
+.wr .axe-handle { right: -8px; }   /* centered at right edge of wing */
 
 /* Handle end-caps (small knobs at top & bottom) */
 .axe-handle::before,

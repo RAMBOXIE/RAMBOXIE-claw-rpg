@@ -242,6 +242,78 @@ function AlienHeadShape({ color, width=300, height=550 }: { color:string; width?
   )
 }
 
+// ── Axe Blade SVG ─────────────────────────────────────────────
+// Positioned outside the wing div (left: -110px / right: -110px)
+// so it visually extends BEYOND the panel without clipping any content.
+// Shape: crescent half-moon — widest at mid-height, tapers top & bottom.
+// The axe-handle pole passes through the inner attachment zone.
+
+function BladeSvg({ side, color }: { side: 'left'|'right'; color: string }) {
+  const isL = side === 'left'
+  const W = 110   // how far the blade sticks out
+  const H = 280   // matches wing height (row-2 = 280px)
+
+  // ── Blade path (in local SVG coords, W × H) ──────────────────
+  // For LEFT blade:  inner attachment edge is at x=W, outer tip at x=0
+  // For RIGHT blade: inner attachment edge is at x=0, outer tip at x=W
+  const bladePath = isL
+    ? `M ${W},0 L ${W},${H} Q ${W*0.25},${H*0.83} 0,${H*0.5} Q ${W*0.25},${H*0.17} ${W},0 Z`
+    : `M 0,0 L 0,${H} Q ${W*0.75},${H*0.83} ${W},${H*0.5} Q ${W*0.75},${H*0.17} 0,0 Z`
+
+  // Cutting-edge highlight path (just the outer curved edge, no fill)
+  const edgePath = isL
+    ? `M ${W},0 Q ${W*0.25},${H*0.17} 0,${H*0.5} Q ${W*0.25},${H*0.83} ${W},${H}`
+    : `M 0,0 Q ${W*0.75},${H*0.17} ${W},${H*0.5} Q ${W*0.75},${H*0.83} 0,${H}`
+
+  return (
+    <svg
+      viewBox={`0 0 ${W} ${H}`}
+      xmlns="http://www.w3.org/2000/svg"
+      style={{
+        position: 'absolute',
+        top: 0,
+        [isL ? 'right' : 'left']: '100%',   // flush against outer edge of wing
+        width: W,
+        height: H,
+        overflow: 'visible',
+        zIndex: 5,
+        pointerEvents: 'none',
+      }}
+    >
+      <defs>
+        <linearGradient id={`blg-${side}`}
+          x1={isL ? '1' : '0'} y1="0" x2={isL ? '0' : '1'} y2="0">
+          <stop offset="0%"   stopColor={color} stopOpacity="0.55"/>
+          <stop offset="60%"  stopColor={color} stopOpacity="0.22"/>
+          <stop offset="100%" stopColor={color} stopOpacity="0.05"/>
+        </linearGradient>
+        <filter id={`bgl-${side}`} x="-30%" y="-10%" width="160%" height="120%">
+          <feGaussianBlur stdDeviation="6" result="b"/>
+          <feFlood floodColor={color} floodOpacity="0.7" result="c"/>
+          <feComposite in="c" in2="b" operator="in" result="g"/>
+          <feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+
+      {/* Blade fill */}
+      <path d={bladePath} fill={`url(#blg-${side})`}/>
+
+      {/* Glowing border */}
+      <path d={bladePath} fill="none" stroke={color} strokeWidth="2"
+        filter={`url(#bgl-${side})`}/>
+
+      {/* Cutting-edge highlight (bright white shimmer on outer curve) */}
+      <path d={edgePath} fill="none" stroke="rgba(255,255,255,0.45)" strokeWidth="1.2"/>
+
+      {/* Inner bevel line */}
+      <path d={bladePath} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="1"
+        transform={isL
+          ? `translate(-2,3) scale(${(W-4)/W},${(H-6)/H})`
+          : `translate(2,3) scale(${(W-4)/W},${(H-6)/H})`}/>
+    </svg>
+  )
+}
+
 // ── SoulWeb (kept, not rendered) ──────────────────────────────
 function SoulWeb(_p: { stats:Stats; classColor:string; size?:number }) { return null }
 
@@ -324,6 +396,7 @@ export default function App() {
         {/* ─── Left EQ wing: col 2, ROW 2 ONLY ─── */}
         <div className="wing wl">
           <div className="axe-handle"/>
+          <BladeSvg side="left" color={cc}/>
           <div className="wing-hdr">EQUALIZER</div>
 
           <div className="eq-bars">
@@ -430,6 +503,7 @@ export default function App() {
         {/* ─── Right playlist wing: col 4, ROW 2 ONLY ─── */}
         <div className="wing wr">
           <div className="axe-handle"/>
+          <BladeSvg side="right" color={cc}/>
           <div className="wing-hdr">
             FEATS <span className="f-cnt">{String(feats.length).padStart(2,'0')}</span>
           </div>
