@@ -289,7 +289,10 @@ export default function App() {
         } as React.CSSProperties}>
 
           {/* ── 稀有度標籤（左上角）── */}
-          <div className="rarity-badge" style={{ color: rarity.color }}>
+          <div
+            className={`rarity-badge${rarity.label === 'MYTHIC' ? ' mythic-rarity' : ''}`}
+            style={{ color: rarity.color }}
+          >
             {rarity.label}
           </div>
 
@@ -305,7 +308,7 @@ export default function App() {
           <div className="portrait-frame">
             {/* WC3 風格：職業圖騰大符文，置於背景 */}
             <div className="class-rune-bg">{rune}</div>
-            <SoulWeb stats={char.stats} classColor={classColor} size={260} />
+            <SoulWeb stats={char.stats} classColor={classColor} size={250} />
           </div>
 
           {/* ── 職業橫幅 ── */}
@@ -415,7 +418,10 @@ export default function App() {
         {/* XP 條（卡牌外） */}
         <div className="xp-bar-outer">
           <div className="xp-bar-inner"
-            style={{ width: `${progress}%`, background: rarity.color }} />
+            style={{
+              width: `${progress}%`,
+              '--bar-color': rarity.color,
+            } as React.CSSProperties} />
         </div>
         <div className="xp-label-row">
           <span>{fmtNum(char.xp)} XP</span>
