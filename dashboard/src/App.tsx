@@ -162,20 +162,18 @@ function LobsterSprite({ classColor, size=160 }: { classColor:string; size?:numb
 function AlienHeadShape({ color, width=300, height=550 }: { color:string; width?:number; height?:number }) {
   const w = width, h = height
 
-  // Outer head silhouette:
-  // - Top 20%: dome (narrower, rounded)
-  // - Middle 50%: full width (where wings attach flush)
-  // - Bottom 30%: face tapers to rounded chin
+  // Shield silhouette:
+  // - Top: flat / square corners (like a heater shield)
+  // - Sides: straight down to ~68% height
+  // - Bottom: two curves converging to a pointed tip
   const head = `
-    M ${w*0.22},0
-    Q 0,0 0,${h*0.12}
-    L 0,${h*0.72}
-    Q 0,${h*0.84} ${w*0.1},${h*0.91}
-    Q ${w*0.28},${h} ${w*0.5},${h}
-    Q ${w*0.72},${h} ${w*0.9},${h*0.91}
-    Q ${w},${h*0.84} ${w},${h*0.72}
-    L ${w},${h*0.12}
-    Q ${w},0 ${w*0.78},0
+    M 0,0
+    L ${w},0
+    L ${w},${h*0.68}
+    Q ${w*0.98},${h*0.80} ${w*0.72},${h*0.90}
+    Q ${w*0.56},${h*0.97} ${w*0.5},${h}
+    Q ${w*0.44},${h*0.97} ${w*0.28},${h*0.90}
+    Q ${w*0.02},${h*0.80} 0,${h*0.68}
     Z
   `
 
@@ -217,23 +215,29 @@ function AlienHeadShape({ color, width=300, height=550 }: { color:string; width?
       <path d={head} fill="none" stroke={color} strokeWidth="2.5"
         filter="url(#hglow)" opacity="0.95"/>
 
-      {/* ── 3. Inner chrome highlight (1px inside the border) ── */}
-      <path d={head} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="1"
-        transform={`translate(3,2) scale(${(w-6)/w},${(h-4)/h})`}/>
+      {/* ── 3. Inner shield bevel (1px inset of the border) ── */}
+      <path d={head} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="1"
+        transform={`translate(5,4) scale(${(w-10)/w},${(h-6)/h})`}/>
 
-      {/* ── 4. Forehead highlight dome ── */}
-      <ellipse cx={w*0.5} cy={h*0.07} rx={w*0.28} ry={h*0.045}
-        fill="rgba(255,255,255,0.04)"/>
+      {/* ── 4. Central vertical dividing line (heraldic) ── */}
+      <line x1={w*0.5} y1={h*0.04} x2={w*0.5} y2={h*0.62}
+        stroke="rgba(255,255,255,0.07)" strokeWidth="1"/>
 
-      {/* ── 5. Cheekbone highlights ── */}
-      <ellipse cx={w*0.12} cy={h*0.65} rx={w*0.08} ry={h*0.04}
-        fill="rgba(255,255,255,0.04)"/>
-      <ellipse cx={w*0.88} cy={h*0.65} rx={w*0.08} ry={h*0.04}
-        fill="rgba(255,255,255,0.04)"/>
+      {/* ── 5. Horizontal dividing line (top quarter) ── */}
+      <line x1={w*0.04} y1={h*0.28} x2={w*0.96} y2={h*0.28}
+        stroke="rgba(255,255,255,0.06)" strokeWidth="1"/>
 
-      {/* ── CHIN shadow ── */}
-      <ellipse cx={w*0.5} cy={h*0.95} rx={w*0.2} ry={h*0.025}
-        fill="rgba(0,0,0,0.45)"/>
+      {/* ── 6. Top-left corner highlight (shield face catch light) ── */}
+      <ellipse cx={w*0.22} cy={h*0.09} rx={w*0.14} ry={h*0.06}
+        fill="rgba(255,255,255,0.05)"/>
+
+      {/* ── 7. Shield boss / umbo circle (center of lower half) ── */}
+      <circle cx={w*0.5} cy={h*0.48} r={w*0.07}
+        fill="none" stroke={color} strokeWidth="1" opacity="0.25"/>
+
+      {/* ── 8. Bottom point shadow ── */}
+      <ellipse cx={w*0.5} cy={h*0.97} rx={w*0.08} ry={h*0.018}
+        fill="rgba(0,0,0,0.5)"/>
     </svg>
   )
 }

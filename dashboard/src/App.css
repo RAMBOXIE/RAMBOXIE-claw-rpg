@@ -46,14 +46,12 @@ body {
    Plain dark rectangles — no clip-path, no shapes
    ────────────────────────────────────────────── */
 .wing {
-  background: linear-gradient(180deg, #14102a 0%, #0e0a1e 50%, #090614 100%);
-  border: 1px solid #2a2248;
-  border-top: 1px solid #3a2a58;
-  border-bottom: 1px solid #1a1230;
+  background: linear-gradient(180deg, #1a1232 0%, #0e0a1e 50%, #0a0618 100%);
   position: relative;
-  overflow: hidden;
+  overflow: visible; /* allow drop-shadow glow to bleed */
   display: flex;
   flex-direction: column;
+  /* axe blade shapes applied per-side below */
 }
 /* Scan-line texture */
 .wing::after {
@@ -65,8 +63,46 @@ body {
   pointer-events: none;
   z-index: 1;
 }
-.wl { grid-column: 1; grid-row: 2; border-right: 2px solid var(--cc, #14b8a6); }
-.wr { grid-column: 3; grid-row: 2; border-left:  2px solid var(--cc, #14b8a6); }
+
+/* ── Left axe wing ──────────────────────────────────────────
+   Shape: crescent/axe blade pointing LEFT
+   Right edge (x=230): straight, flush against the shield
+   Left outer edge: curves out — widest at mid-height (y=140)
+   Top/bottom blade tips narrow back in                      */
+.wl {
+  grid-column: 1;
+  grid-row: 2;
+  clip-path: path('M 230,0 L 60,0 Q 0,50 0,140 Q 0,230 60,280 L 230,280 Z');
+  filter: drop-shadow(3px 0 12px color-mix(in srgb, var(--cc, #14b8a6) 60%, transparent));
+}
+
+/* ── Right axe wing ─────────────────────────────────────────
+   Mirror of left                                             */
+.wr {
+  grid-column: 3;
+  grid-row: 2;
+  clip-path: path('M 0,0 L 170,0 Q 230,50 230,140 Q 230,230 170,280 L 0,280 Z');
+  filter: drop-shadow(-3px 0 12px color-mix(in srgb, var(--cc, #14b8a6) 60%, transparent));
+}
+
+/* Outer cutting-edge highlight on each axe blade */
+.wl::before, .wr::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+.wl::before {
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--cc, #14b8a6) 20%, transparent) 0%,
+    transparent 35%);
+}
+.wr::before {
+  background: linear-gradient(270deg,
+    color-mix(in srgb, var(--cc, #14b8a6) 20%, transparent) 0%,
+    transparent 35%);
+}
 
 .wing-hdr {
   font-size: 8px;
