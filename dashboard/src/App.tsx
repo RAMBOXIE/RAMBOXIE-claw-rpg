@@ -78,7 +78,7 @@ function fmtSign(n: number): string { return (n >= 0 ? '+' : '') + n }
 
 interface SoulWebProps { stats: Stats; classColor: string; size?: number }
 
-function SoulWeb({ stats, classColor, size = 320 }: SoulWebProps) {
+function SoulWeb({ stats, classColor, size = 280 }: SoulWebProps) {
   const cx = size / 2, cy = size / 2, R = size * 0.38, maxVal = 20
   const angles = [-90, -30, 30, 90, 150, 210]
 
@@ -101,7 +101,7 @@ function SoulWeb({ stats, classColor, size = 320 }: SoulWebProps) {
 
   function labelPos(idx: number): [number, number] {
     const ang = angles[idx] * (Math.PI / 180)
-    const r = R + 28
+    const r = R + 26
     return [cx + r * Math.cos(ang), cy + r * Math.sin(ang)]
   }
 
@@ -145,11 +145,11 @@ function SoulWeb({ stats, classColor, size = 320 }: SoulWebProps) {
         const val  = stats[key as keyof Stats] ?? 10
         return (
           <g key={key} textAnchor="middle">
-            <text x={lx} y={ly - 6} fontSize={11} fill="#94a3b8" dominantBaseline="auto">
-              {info.icon} {info.en}
+            <text x={lx} y={ly - 5} fontSize={10} fill="#94a3b8" dominantBaseline="auto">
+              {info.icon} {info.dnd}
             </text>
-            <text x={lx} y={ly + 9} fontSize={11} fill={classColor} dominantBaseline="auto">
-              {info.dnd} {val}({modStr(val)})
+            <text x={lx} y={ly + 8} fontSize={10} fill={classColor} dominantBaseline="auto">
+              {val}({modStr(val)})
             </text>
           </g>
         )
@@ -181,7 +181,11 @@ export default function App() {
     return () => es.close()
   }, [])
 
-  if (loading) return <div className="center-msg"><h2>🦞 Loading…</h2></div>
+  if (loading) return (
+    <div className="center-msg">
+      <h2>🦞 Loading…</h2>
+    </div>
+  )
 
   if (error || !char) return (
     <div className="center-msg">
@@ -197,174 +201,125 @@ export default function App() {
   const title      = TITLES[Math.min(char.prestige, TITLES.length - 1)]
   const progress   = levelProgress(char.xp, char.level)
   const toNext     = xpToNext(char.xp, char.level)
-
-  const derivedItems = [
-    { label: 'HP',   val: char.hp   != null ? String(char.hp)           : '—' },
-    { label: 'AC',   val: char.ac   != null ? String(char.ac)           : '—' },
-    { label: 'Init', val: char.initiative != null ? fmtSign(char.initiative) : '—' },
-    { label: 'BAB',  val: char.bab  != null ? fmtSign(char.bab)         : '—' },
-    { label: 'Fort', val: char.saves != null ? fmtSign(char.saves.fort) : '—' },
-    { label: 'Ref',  val: char.saves != null ? fmtSign(char.saves.ref)  : '—' },
-    { label: 'Will', val: char.saves != null ? fmtSign(char.saves.will) : '—' },
-  ]
-
-  const feats = char.feats ?? []
+  const feats      = char.feats ?? []
   const isClassFeat = (f: string) => /\[.+\]/.test(f)
 
   return (
-    <div className="app">
+    <div className="page-bg">
+      <div className="card-wrap">
 
-      {/* ── Header ── */}
-      <div className="header" style={{ borderLeft: `4px solid ${classColor}` }}>
-        <div className="header-avatar">🦞</div>
-        <div className="header-info">
-          <div className="header-name">{char.name}</div>
-          <span className="header-title">{title}</span>
-          <div className="header-class" style={{ color: classColor }}>{cls.icon} {cls.en}</div>
-        </div>
-        <div className="header-level" style={{ borderColor: classColor + '66' }}>
-          <div className="lv-label">LEVEL</div>
-          <div className="lv-num" style={{ color: classColor }}>{char.level}</div>
-          <div className="header-prestige" style={{ color: classColor }}>
-            BAB {char.bab != null ? fmtSign(char.bab) : '—'}
+        {/* 卡牌主體 */}
+        <div className="card" style={{ '--class-color': classColor } as React.CSSProperties}>
+
+          {/* 等級水晶 */}
+          <div className="level-crystal">{char.level}</div>
+
+          {/* 姓名橫幅 */}
+          <div className="name-banner">
+            <span className="name-text">{char.name}</span>
           </div>
-        </div>
-      </div>
 
-      {/* ── XP Bar ── */}
-      <div className="xp-section">
-        <div className="xp-labels">
-          <span>Experience</span>
-          <span>
-            <strong>{fmtNum(char.xp)}</strong>
-            {char.level < 999 && <> / {fmtNum(xpForLevel(char.level + 1))} XP</>}
-          </span>
-        </div>
-        <div className="xp-bar-track">
-          <div className="xp-bar-fill"
-            style={{ width: `${progress}%`, background: `linear-gradient(90deg, ${classColor}, ${classColor}bb)` }} />
-        </div>
-        <div className="xp-sub">
-          {char.level >= 999
-            ? '🌟 Max Level! Run: node scripts/levelup.mjs --prestige'
-            : `${progress}%  ·  ${fmtNum(toNext)} XP to Lv.${char.level + 1}`}
-        </div>
-      </div>
-
-      {/* ── Main 2-col ── */}
-      <div className="grid-2">
-
-        {/* Left: Soul Web + Combat Stats */}
-        <div className="card">
-          <div className="card-title">Soul Web</div>
-          <SoulWeb stats={char.stats} classColor={classColor} size={300} />
-          <div className="derived-grid">
-            {derivedItems.map(item => (
-              <div className="derived-item" key={item.label}>
-                <div className="derived-val" style={{ color: classColor }}>{item.val}</div>
-                <div className="derived-label">{item.label}</div>
-              </div>
-            ))}
+          {/* 插畫區 */}
+          <div className="portrait-frame">
+            <SoulWeb stats={char.stats} classColor={classColor} size={280} />
           </div>
-        </div>
 
-        {/* Right: Ability Scores + Class Features + Feats */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {/* 職業橫幅 */}
+          <div className="class-banner">
+            {cls.icon} {cls.en}
+          </div>
 
-          <div className="card">
-            <div className="card-title">Ability Scores</div>
-            <div className="stat-list">
-              {Object.entries(STAT_INFO).map(([key, info]) => {
-                const val = char.stats[key as keyof Stats] ?? 10
+          {/* 描述框 */}
+          <div className="desc-box">
+
+            {/* 六屬性行 */}
+            <div className="ability-row">
+              {STAT_KEYS.map(k => {
+                const info = STAT_INFO[k]
+                const val  = char.stats[k as keyof Stats]
                 return (
-                  <div className="stat-row" key={key}>
-                    <span className="stat-icon">{info.icon}</span>
-                    <span className="stat-name">{info.en}</span>
-                    <div className="stat-bar-track">
-                      <div className="stat-bar-fill"
-                        style={{ width: `${(val / 20) * 100}%`,
-                          background: `linear-gradient(90deg, ${classColor}bb, ${classColor})` }} />
-                    </div>
-                    <span className="stat-val">{val}</span>
-                    <span className="stat-mod" style={{ color: classColor }}>{modStr(val)}</span>
-                    <span className="stat-dnd">{info.dnd}</span>
+                  <div className="ability-cell" key={k}>
+                    <div className="ability-dnd" style={{ color: classColor }}>{info.dnd}</div>
+                    <div className="ability-num">{val}</div>
+                    <div className="ability-mod">{modStr(val)}</div>
                   </div>
                 )
               })}
             </div>
-          </div>
 
-          <div className="card">
-            <div className="card-title">Class Features</div>
-            {char.abilities?.length ? (
-              <div className="ability-list">
-                {char.abilities.map(a => (
-                  <span className="ability-badge" key={a}
-                    style={{ borderColor: classColor + '66', color: classColor }}>{a}</span>
-                ))}
+            <div className="divider" />
+
+            {/* 衍生數值 */}
+            <div className="combat-row">
+              <span>AC <strong>{char.ac ?? '—'}</strong></span>
+              <span>Init <strong style={{ color: classColor }}>{fmtSign(char.initiative ?? 0)}</strong></span>
+              <span>Fort <strong>{fmtSign(char.saves?.fort ?? 0)}</strong></span>
+              <span>Ref <strong>{fmtSign(char.saves?.ref ?? 0)}</strong></span>
+              <span>Will <strong>{fmtSign(char.saves?.will ?? 0)}</strong></span>
+            </div>
+
+            <div className="divider" />
+
+            {/* 職業特性 */}
+            {char.abilities?.length > 0 && (
+              <div className="features-text">
+                {char.abilities.join(' · ')}
               </div>
-            ) : (
-              <p style={{ color: '#475569', fontSize: 13 }}>Level up to unlock class features</p>
             )}
-          </div>
 
-          <div className="card">
-            <div className="card-title">Feats ({feats.length})</div>
-            {feats.length ? (
-              <div className="feat-list">
-                {feats.map(f => (
-                  <span key={f}
-                    className={`feat-tag${isClassFeat(f) ? ' class-feat' : ''}`}
-                    style={isClassFeat(f) ? { color: classColor, borderColor: classColor + '88' } : {}}>
-                    {f}
-                  </span>
-                ))}
+            {/* Feats 緊湊 */}
+            {feats.length > 0 && (
+              <div className="feats-section">
+                <span className="feats-label">Feats ({feats.length})</span>
+                <div className="feats-compact">
+                  {feats.map(f => (
+                    <span
+                      key={f}
+                      className={`feat-chip${isClassFeat(f) ? ' class' : ''}`}
+                      style={isClassFeat(f) ? { color: classColor } : {}}
+                    >
+                      {f}
+                    </span>
+                  ))}
+                </div>
               </div>
-            ) : (
-              <p style={{ color: '#475569', fontSize: 13 }}>No feats yet</p>
             )}
-            {(char.classHistory?.length ?? 0) > 0 && (
-              <>
-                <div className="card-title" style={{ marginTop: 20 }}>Class History</div>
-                {char.classHistory.map((h, i) => (
-                  <div key={i} style={{ fontSize: 12, color: '#64748b', marginBottom: 4 }}>
-                    {CLASSES[h.from]?.en ?? h.from} → {CLASSES[h.to]?.en ?? h.to}
-                    <span style={{ marginLeft: 6 }}>{h.date?.slice(0, 10)}</span>
-                  </div>
-                ))}
-              </>
-            )}
+
+          </div>{/* .desc-box */}
+
+          {/* 底部欄 */}
+          <div className="card-footer">
+            {/* 攻擊寶石（左） */}
+            <div className="gem gem-atk">
+              <span className="gem-val">{char.bab != null ? fmtSign(char.bab) : '—'}</span>
+              <span className="gem-label">BAB</span>
+            </div>
+
+            {/* 中間稱號 */}
+            <div className="footer-title">{title}</div>
+
+            {/* 生命寶石（右） */}
+            <div className="gem gem-hp">
+              <span className="gem-val">{char.hp ?? '—'}</span>
+              <span className="gem-label">HP</span>
+            </div>
           </div>
-        </div>
-      </div>
 
-      {/* ── Bottom stats ── */}
-      <div className="grid-4">
-        <div className="stat-card">
-          <div className="stat-card-icon">💬</div>
-          <div className="stat-card-val">{fmtNum(char.conversations)}</div>
-          <div className="stat-card-label">Conversations</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-card-icon">📥</div>
-          <div className="stat-card-val">{fmtNum(char.tokens?.consumed ?? 0)}</div>
-          <div className="stat-card-label">Tokens In</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-card-icon">📤</div>
-          <div className="stat-card-val">{fmtNum(char.tokens?.produced ?? 0)}</div>
-          <div className="stat-card-label">Tokens Out</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-card-icon">🌟</div>
-          <div className="stat-card-val">{char.prestige}</div>
-          <div className="stat-card-label">Prestiges</div>
-        </div>
-      </div>
+        </div>{/* .card */}
 
-      <div className="footer">
-        🦞 Claw RPG · Last updated {char.updatedAt?.slice(0, 16).replace('T', ' ')} UTC · Live via SSE
-      </div>
+        {/* XP 條（卡牌下方） */}
+        <div className="xp-bar-outer">
+          <div className="xp-bar-inner" style={{ width: `${progress}%`, background: classColor }} />
+        </div>
+        <div className="xp-label-row">
+          <span>{fmtNum(char.xp)} XP</span>
+          <span>{progress}% · {fmtNum(toNext)} to Lv.{char.level + 1}</span>
+        </div>
+
+        {/* 底部連接狀態 */}
+        <div className="live-badge">⚡ Live via SSE · {char.updatedAt?.slice(11, 16)} UTC</div>
+
+      </div>{/* .card-wrap */}
     </div>
   )
 }
