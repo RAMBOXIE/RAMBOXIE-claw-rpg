@@ -156,25 +156,41 @@ function LobsterSprite({ classColor, size=160 }: { classColor:string; size?:numb
 }
 
 // ── Alien Head SVG Shape ──────────────────────────────────────
-// This is drawn as actual SVG so it clearly looks like a head.
+// Draws the full alien head with actual FACE FEATURES:
+// forehead dome → CRT zone → face (eyes + nose + chin)
 
-function AlienHeadShape({ color, width=300, height=540 }: { color:string; width?:number; height?:number }) {
+function AlienHeadShape({ color, width=300, height=550 }: { color:string; width?:number; height?:number }) {
   const w = width, h = height
-  // Head path: narrow top, wide middle (where wings attach = y:120 to y:390), tapered chin
-  const headPath = [
-    `M ${w*0.22},0`,
-    `L ${w*0.78},0`,
-    `Q ${w},0 ${w},${h*0.12}`,
-    `L ${w},${h*0.72}`,
-    `Q ${w*0.98},${h*0.82} ${w*0.88},${h*0.88}`,
-    `L ${w*0.72},${h*0.94}`,
-    `Q ${w*0.6},${h} ${w*0.5},${h}`,
-    `Q ${w*0.4},${h} ${w*0.28},${h*0.94}`,
-    `L ${w*0.12},${h*0.88}`,
-    `Q ${w*0.02},${h*0.82} 0,${h*0.72}`,
-    `L 0,${h*0.12}`,
-    `Q 0,0 ${w*0.22},0 Z`,
-  ].join(' ')
+
+  // Outer head silhouette:
+  // - Top 20%: dome (narrower, rounded)
+  // - Middle 50%: full width (where wings attach flush)
+  // - Bottom 30%: face tapers to rounded chin
+  const head = `
+    M ${w*0.22},0
+    Q 0,0 0,${h*0.12}
+    L 0,${h*0.72}
+    Q 0,${h*0.84} ${w*0.1},${h*0.91}
+    Q ${w*0.28},${h} ${w*0.5},${h}
+    Q ${w*0.72},${h} ${w*0.9},${h*0.91}
+    Q ${w},${h*0.84} ${w},${h*0.72}
+    L ${w},${h*0.12}
+    Q ${w},0 ${w*0.78},0
+    Z
+  `
+
+  // Face zone: the chin area (y = 390px to 550px in a 550px head)
+  // Eyes sit at ~y=430, wide oval sockets
+  const eyeY   = h * 0.80        // 440px
+  const eyeRx  = w * 0.14        // 42px horizontal
+  const eyeRy  = h * 0.055       // 30px vertical
+  const eyeLx  = w * 0.30        // 90px  left eye center
+  const eyeRxC = w * 0.70        // 210px right eye center
+
+  // Nose bridge: thin vertical shape between eyes
+  const noseTop = h * 0.845
+  const noseMid = h * 0.875
+  const noseBtm = h * 0.910
 
   return (
     <svg
@@ -183,44 +199,113 @@ function AlienHeadShape({ color, width=300, height=540 }: { color:string; width?
       style={{ position:'absolute', inset:0, width:'100%', height:'100%', zIndex:0, overflow:'visible' }}
     >
       <defs>
-        <radialGradient id="hg" cx="50%" cy="35%" r="65%">
-          <stop offset="0%"   stopColor={color} stopOpacity="0.15"/>
-          <stop offset="60%"  stopColor="#0c0618" stopOpacity="1"/>
-          <stop offset="100%" stopColor="#060410" stopOpacity="1"/>
+        {/* Radial gradient: slight class-color glow in middle, dark edges */}
+        <radialGradient id="hbg" cx="50%" cy="38%" r="60%">
+          <stop offset="0%"  stopColor={color} stopOpacity="0.12"/>
+          <stop offset="55%" stopColor="#0c0620" stopOpacity="1"/>
+          <stop offset="100%" stopColor="#060412" stopOpacity="1"/>
         </radialGradient>
-        <filter id="hglow" x="-20%" y="-10%" width="140%" height="120%">
-          <feGaussianBlur stdDeviation="8" result="blur"/>
-          <feFlood floodColor={color} floodOpacity="0.6" result="c"/>
+
+        {/* Face-zone gradient: slightly lighter so features are visible */}
+        <radialGradient id="facebg" cx="50%" cy="30%" r="70%">
+          <stop offset="0%"  stopColor={color} stopOpacity="0.08"/>
+          <stop offset="100%" stopColor="#070314" stopOpacity="1"/>
+        </radialGradient>
+
+        {/* Glow filter for outline */}
+        <filter id="hglow" x="-25%" y="-10%" width="150%" height="120%">
+          <feGaussianBlur stdDeviation="10" result="blur"/>
+          <feFlood floodColor={color} floodOpacity="0.7" result="c"/>
+          <feComposite in="c" in2="blur" operator="in" result="g"/>
+          <feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+
+        {/* Eye inner glow */}
+        <filter id="eglow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="5" result="blur"/>
+          <feFlood floodColor={color} floodOpacity="0.5" result="c"/>
           <feComposite in="c" in2="blur" operator="in" result="g"/>
           <feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
       </defs>
 
-      {/* Head fill */}
-      <path d={headPath} fill="url(#hg)" />
+      {/* ── 1. Head fill ── */}
+      <path d={head} fill="url(#hbg)"/>
 
-      {/* Head glowing outline */}
-      <path d={headPath} fill="none" stroke={color} strokeWidth="2.5"
-        filter="url(#hglow)" opacity="0.9"/>
+      {/* ── 2. Glowing border (most important visual) ── */}
+      <path d={head} fill="none" stroke={color} strokeWidth="2.5"
+        filter="url(#hglow)" opacity="0.95"/>
 
-      {/* Inner edge highlight */}
-      <path d={headPath} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="1"
-        transform="translate(2,2) scale(0.987,0.993)"/>
+      {/* ── 3. Inner chrome highlight (1px inside the border) ── */}
+      <path d={head} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="1"
+        transform={`translate(3,2) scale(${(w-6)/w},${(h-4)/h})`}/>
 
-      {/* Eye socket left (decorative shadow areas) */}
-      <ellipse cx={w*0.3} cy={h*0.42} rx={w*0.1} ry={h*0.05}
-        fill="rgba(0,0,0,0.45)" />
-      {/* Eye socket right */}
-      <ellipse cx={w*0.7} cy={h*0.42} rx={w*0.1} ry={h*0.05}
-        fill="rgba(0,0,0,0.45)" />
+      {/* ── 4. Forehead highlight dome ── */}
+      <ellipse cx={w*0.5} cy={h*0.07} rx={w*0.28} ry={h*0.045}
+        fill="rgba(255,255,255,0.04)"/>
 
-      {/* Forehead highlight */}
-      <ellipse cx={w*0.5} cy={h*0.08} rx={w*0.25} ry={h*0.04}
-        fill="rgba(255,255,255,0.03)"/>
+      {/* ── 5. Cheekbone highlights ── */}
+      <ellipse cx={w*0.12} cy={h*0.65} rx={w*0.08} ry={h*0.04}
+        fill="rgba(255,255,255,0.04)"/>
+      <ellipse cx={w*0.88} cy={h*0.65} rx={w*0.08} ry={h*0.04}
+        fill="rgba(255,255,255,0.04)"/>
 
-      {/* Chin shadow */}
-      <ellipse cx={w*0.5} cy={h*0.93} rx={w*0.18} ry={h*0.025}
-        fill="rgba(0,0,0,0.35)"/>
+      {/* ══════════════════════════════════════════
+          FACE AREA — the KEY alien visual element
+          Eyes, nose, chin in the lower 30% of head
+          ══════════════════════════════════════════ */}
+
+      {/* Face zone background (slightly different from head fill) */}
+      <clipPath id="faceClip">
+        <path d={head}/>
+      </clipPath>
+
+      {/* Face skin / shading */}
+      <ellipse cx={w*0.5} cy={h*0.85} rx={w*0.42} ry={h*0.17}
+        fill={color} fillOpacity="0.04" clipPath="url(#faceClip)"/>
+
+      {/* ── LEFT EYE ── */}
+      {/* Socket (deep dark hollow) */}
+      <ellipse cx={eyeLx} cy={eyeY} rx={eyeRx} ry={eyeRy}
+        fill="#020108" clipPath="url(#faceClip)"/>
+      {/* Socket rim (glowing ring) */}
+      <ellipse cx={eyeLx} cy={eyeY} rx={eyeRx} ry={eyeRy}
+        fill="none" stroke={color} strokeWidth="1.5"
+        filter="url(#eglow)" clipPath="url(#faceClip)"/>
+      {/* Iris glow (inner brighter area) */}
+      <ellipse cx={eyeLx} cy={eyeY} rx={eyeRx*0.5} ry={eyeRy*0.55}
+        fill={color} fillOpacity="0.18" clipPath="url(#faceClip)"/>
+      {/* Pupil */}
+      <ellipse cx={eyeLx} cy={eyeY} rx={eyeRx*0.22} ry={eyeRy*0.28}
+        fill={color} fillOpacity="0.5" clipPath="url(#faceClip)"/>
+      {/* Eye highlight (top-left sparkle) */}
+      <ellipse cx={eyeLx - eyeRx*0.3} cy={eyeY - eyeRy*0.3}
+        rx={eyeRx*0.18} ry={eyeRy*0.2}
+        fill="rgba(255,255,255,0.35)" clipPath="url(#faceClip)"/>
+
+      {/* ── RIGHT EYE ── */}
+      <ellipse cx={eyeRxC} cy={eyeY} rx={eyeRx} ry={eyeRy}
+        fill="#020108" clipPath="url(#faceClip)"/>
+      <ellipse cx={eyeRxC} cy={eyeY} rx={eyeRx} ry={eyeRy}
+        fill="none" stroke={color} strokeWidth="1.5"
+        filter="url(#eglow)" clipPath="url(#faceClip)"/>
+      <ellipse cx={eyeRxC} cy={eyeY} rx={eyeRx*0.5} ry={eyeRy*0.55}
+        fill={color} fillOpacity="0.18" clipPath="url(#faceClip)"/>
+      <ellipse cx={eyeRxC} cy={eyeY} rx={eyeRx*0.22} ry={eyeRy*0.28}
+        fill={color} fillOpacity="0.5" clipPath="url(#faceClip)"/>
+      <ellipse cx={eyeRxC - eyeRx*0.3} cy={eyeY - eyeRy*0.3}
+        rx={eyeRx*0.18} ry={eyeRy*0.2}
+        fill="rgba(255,255,255,0.35)" clipPath="url(#faceClip)"/>
+
+      {/* ── NOSE ── (subtle vertical ridge between eyes) */}
+      <path d={`M ${w*0.5},${noseTop} Q ${w*0.46},${noseMid} ${w*0.48},${noseBtm}
+                M ${w*0.5},${noseTop} Q ${w*0.54},${noseMid} ${w*0.52},${noseBtm}`}
+        fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="1.5"
+        clipPath="url(#faceClip)"/>
+
+      {/* ── CHIN shadow ── */}
+      <ellipse cx={w*0.5} cy={h*0.95} rx={w*0.2} ry={h*0.025}
+        fill="rgba(0,0,0,0.45)" clipPath="url(#faceClip)"/>
     </svg>
   )
 }
@@ -239,30 +324,7 @@ function xpToNext(xp:number, level:number) { return level>=999 ? 0 : xpForLevel(
 function fmtNum(n:number) { return n.toLocaleString() }
 function fmtSign(n:number) { return (n>=0?'+':'')+n }
 
-// ── Speaker ───────────────────────────────────────────────────
-function Speaker({ color, delay=0 }: { color:string; delay?:number }) {
-  return (
-    <div className="speaker-unit" style={{ animationDelay:`${delay}s` }}>
-      <svg width="60" height="60" viewBox="0 0 60 60">
-        <defs>
-          <radialGradient id={`sg${delay}`} cx="38%" cy="32%" r="60%">
-            <stop offset="0%"   stopColor="#505068"/>
-            <stop offset="45%"  stopColor="#1e1e2e"/>
-            <stop offset="100%" stopColor="#080810"/>
-          </radialGradient>
-        </defs>
-        <circle cx="30" cy="30" r="28" fill={`url(#sg${delay})`}/>
-        <circle cx="30" cy="30" r="28" fill="none" stroke="#555" strokeWidth="1.5"/>
-        <ellipse cx="22" cy="19" rx="11" ry="7" fill="rgba(255,255,255,0.07)"/>
-        <circle cx="30" cy="30" r="20" fill="none" stroke="#3a3a4a" strokeWidth="1"/>
-        <circle cx="30" cy="30" r="13" fill="#0a0a14"/>
-        <circle cx="30" cy="30" r="13" fill="none" stroke="#2a2a3a" strokeWidth="1"/>
-        <circle cx="30" cy="30" r="5"  fill="#111118" stroke="#444" strokeWidth="1"/>
-        <circle cx="30" cy="30" r="28" fill="none" stroke={color} strokeWidth="1.5" opacity="0.4"/>
-      </svg>
-    </div>
-  )
-}
+
 
 // ── App ───────────────────────────────────────────────────────
 
@@ -325,12 +387,8 @@ export default function App() {
       */}
       <div className="wg">
 
-        {/* ─── Left speakers: col 1, full height ─── */}
-        <div className="spk-col spk-l">
-          <Speaker color={cc} delay={0}/>
-          <Speaker color={cc} delay={0.5}/>
-          <Speaker color={cc} delay={1.0}/>
-        </div>
+        {/* ─── Left side column: col 1, full height ─── */}
+        <div className="spk-col spk-l"/>
 
         {/* ─── Left EQ wing: col 2, ROW 2 ONLY ─── */}
         <div className="wing wl">
@@ -481,12 +539,8 @@ export default function App() {
           </div>
         </div>
 
-        {/* ─── Right speakers: col 5, full height ─── */}
-        <div className="spk-col spk-r">
-          <Speaker color={cc} delay={0.25}/>
-          <Speaker color={cc} delay={0.75}/>
-          <Speaker color={cc} delay={1.25}/>
-        </div>
+        {/* ─── Right side column: col 5, full height ─── */}
+        <div className="spk-col spk-r"/>
 
       </div>{/* .wg */}
     </div>
