@@ -1,6 +1,6 @@
 ---
 name: claw-rpg
-description: D&D-style RPG character system for AI lobster assistants. Automatically generates a character sheet from SOUL.md and MEMORY.md, assigns class (wizard/bard/rogue/paladin/druid/fighter) and 6 stats, tracks XP from token usage, levels up from 1 to 999 with a prestige system, and fires hidden easter egg flavor text during conversations. Use when: initializing a lobster's RPG character, syncing XP after conversations, checking level/stats, running prestige at Lv.999, or launching the character dashboard.
+description: D&D-style RPG character system for AI lobster assistants. Automatically generates a character sheet from SOUL.md and MEMORY.md, assigns class (wizard/bard/rogue/paladin/druid/fighter) and 6 stats, tracks XP from token usage (~80 XP/conversation), levels up from 1 to 999 with a prestige system, fires hidden easter egg flavor text during conversations, sends daily RPG reports, and includes an arena battle system. Use when: initializing a lobster's RPG character, syncing XP after conversations, checking level/stats, running prestige at Lv.999, launching the character dashboard, or scheduling daily RPG status reports.
 ---
 
 # Claw RPG 🦞⚔️
@@ -92,6 +92,38 @@ See `references/classes.md` and `references/abilities.md`
 
 See `references/prestige.md`
 
+## Daily Report (v1.1.0)
+
+Send a daily RPG status report to Telegram (level, stats, XP progress, class quip):
+
+```bash
+node scripts/report.mjs            # Send report now
+node scripts/report.mjs --preview  # Preview without sending
+```
+
+Set up as an automated daily cron (default 18:00):
+
+```bash
+node scripts/setup-cron.mjs
+```
+
+## Arena (v1.1.0)
+
+Battle other agents or NPCs. Results affect XP and morale:
+
+```bash
+node scripts/arena.mjs --opponent "Shadow Wizard"
+node scripts/arena.mjs --list   # View battle history
+```
+
+## XP Recovery
+
+If XP data gets out of sync, recover from session logs:
+
+```bash
+node scripts/sync-xp-recovery.mjs
+```
+
 ## Files
 
 | File | Description |
@@ -99,3 +131,16 @@ See `references/prestige.md`
 | `character.json` | Character data (auto-generated, do not edit manually) |
 | `arena-history.json` | Arena battle history |
 | `config.json` | Optional: Telegram notification config (`{ "telegram_chat_id": "..." }`) |
+
+## What's New in v1.1.2
+
+- **Save file protection** — `character.json` now stored in `~/.openclaw/workspace/claw-rpg/` instead of the skill directory. Reinstalling the skill no longer resets your level and XP.
+- **Auto migration** — `init.mjs` automatically moves existing save data to the new location on first run.
+
+## What's New in v1.1.0
+
+- **Per-conversation XP** — `easter.mjs` now awards ~80 XP per conversation automatically
+- **Daily Report** — `report.mjs` + `setup-cron.mjs` for automated daily status push to Telegram
+- **Arena system** — `arena.mjs` for agent vs agent/NPC battles
+- **XP Recovery** — `sync-xp-recovery.mjs` to repair XP sync issues
+- **Milestone triggers** — Easter egg always fires at 10th, 25th, 50th, 100th, every 100 after
