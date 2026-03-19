@@ -53,23 +53,21 @@ const STAT_INFO: Record<string, { en: string; icon: string; dnd: string }> = {
 }
 
 const STAT_COLORS: Record<string, string> = {
-  claw:      '#ef4444',  // STR 紅
-  antenna:   '#22c55e',  // DEX 綠
-  shell:     '#f97316',  // CON 橘
-  brain:     '#3b82f6',  // INT 藍
-  foresight: '#eab308',  // WIS 黃
-  charm:     '#a855f7',  // CHA 紫
+  claw:      '#ef4444',
+  antenna:   '#22c55e',
+  shell:     '#f97316',
+  brain:     '#3b82f6',
+  foresight: '#eab308',
+  charm:     '#a855f7',
 }
 
 const STAT_KEYS = ['claw', 'antenna', 'shell', 'brain', 'foresight', 'charm']
 
-// ── WC3 新增常量 ──────────────────────────────────────────────
-
 function deriveMBTI(stats: Stats, bab: number): string {
-  const EI = stats.claw    > stats.brain     ? 'E' : 'I'  // STR vs INT
-  const SN = stats.charm   > stats.foresight ? 'S' : 'N'  // CHA vs WIS
-  const TF = stats.shell   > stats.antenna   ? 'T' : 'F'  // CON vs DEX
-  const JP = bab           > 5               ? 'J' : 'P'  // 高 BAB = 果斷
+  const EI = stats.claw    > stats.brain     ? 'E' : 'I'
+  const SN = stats.charm   > stats.foresight ? 'S' : 'N'
+  const TF = stats.shell   > stats.antenna   ? 'T' : 'F'
+  const JP = bab           > 5               ? 'J' : 'P'
   return EI + SN + TF + JP
 }
 
@@ -85,8 +83,8 @@ const MBTI_NAMES: Record<string, string> = {
 }
 
 function deriveAlignment(stats: Stats): string {
-  const lc = stats.foresight + stats.shell  // WIS + CON
-  const ge = stats.charm + stats.foresight  // CHA + WIS
+  const lc = stats.foresight + stats.shell
+  const ge = stats.charm + stats.foresight
   const law  = lc >= 26 ? 'Lawful'  : lc <= 18 ? 'Chaotic' : 'Neutral'
   const good = ge >= 26 ? 'Good'    : ge <= 18 ? 'Evil'    : 'Neutral'
   return (law === 'Neutral' && good === 'Neutral') ? 'True Neutral' : `${law} ${good}`
@@ -102,17 +100,17 @@ function getRarity(level: number): { label: string; color: string; glow: string 
 }
 
 const CATCHPHRASES: Record<string, string> = {
-  barbarian: "Rage first. Think later. Win anyway.",
-  fighter:   "My claws have never missed. Not once.",
-  paladin:   "Justice is not a shield — it's a weapon.",
-  ranger:    "I was watching before you even walked in.",
-  cleric:    "The gods speak through me. Mostly in complaints.",
-  druid:     "The tide rises for all. Especially the foolish.",
-  monk:      "Still water. Deep current. Sharp claws.",
+  barbarian: "Rage first. Think later.",
+  fighter:   "My claws never missed.",
+  paladin:   "Justice is a weapon.",
+  ranger:    "I was watching before you walked in.",
+  cleric:    "The gods speak through me.",
+  druid:     "The tide rises for all.",
+  monk:      "Still water. Deep current.",
   rogue:     "They never hear the second claw.",
-  bard:      "They'll write songs about this. Probably me.",
-  wizard:    "I have read seventeen books about this mistake.",
-  sorcerer:  "I didn't learn this power. I was born with it.",
+  bard:      "They'll write songs about this.",
+  wizard:    "I've read 17 books on this.",
+  sorcerer:  "Born with it. Not learned.",
 }
 
 const CLASS_RUNE: Record<string, string> = {
@@ -135,68 +133,47 @@ const ABILITY_ICONS: Record<string, string[]> = {
   sorcerer:  ['🐉','💫','⚡','🌀'],
 }
 
-// ── 像素龍蝦數據 ───────────────────────────────────────────────
+// ── Pixel Lobster ───────────────────────────────────────────────
 
 const LOBSTER_PIXELS: [number, number, string][] = [
-  // 觸角 (A = antenna)
   [3,0,'A'],[8,0,'A'],
   [2,1,'A'],[9,1,'A'],
   [1,2,'A'],[10,2,'A'],
-  // 頭部 (H = head = classColor)
   [4,3,'H'],[5,3,'H'],[6,3,'H'],[7,3,'H'],
   [3,4,'H'],[5,4,'H'],[6,4,'H'],[8,4,'H'],
   [3,5,'H'],[4,5,'H'],[5,5,'H'],[6,5,'H'],[7,5,'H'],[8,5,'H'],
-  // 眼睛 (W = white)
   [4,4,'W'],[7,4,'W'],
-  // 螯 (C = claw = classColor, opacity 0.75)
   [2,4,'C'],[9,4,'C'],
   [1,5,'C'],[2,5,'C'],[9,5,'C'],[10,5,'C'],
   [0,6,'C'],[1,6,'C'],[10,6,'C'],[11,6,'C'],
   [0,7,'C'],[1,7,'C'],[10,7,'C'],[11,7,'C'],
   [1,8,'C'],[10,8,'C'],
-  // 身體 (B = body = classColor)
   [3,6,'H'],[8,6,'H'],
   [4,6,'B'],[5,6,'B'],[6,6,'B'],[7,6,'B'],
   [4,7,'B'],[5,7,'B'],[6,7,'B'],[7,7,'B'],
   [4,8,'B'],[5,8,'B'],[6,8,'B'],[7,8,'B'],
   [4,9,'B'],[5,9,'B'],[6,9,'B'],[7,9,'B'],
-  // 尾扇 (T = tail = classColor, opacity 0.85)
   [3,10,'T'],[4,10,'T'],[5,10,'T'],[6,10,'T'],[7,10,'T'],[8,10,'T'],
   [2,11,'T'],[3,11,'T'],[5,11,'T'],[6,11,'T'],[8,11,'T'],[9,11,'T'],
   [1,12,'T'],[2,12,'T'],[5,12,'T'],[6,12,'T'],[9,12,'T'],[10,12,'T'],
   [0,13,'T'],[1,13,'T'],[10,13,'T'],[11,13,'T'],
-  // 高光 (X = highlight rgba(255,255,255,0.25))
   [5,3,'X'],[4,5,'X'],
 ]
 
-// ── LobsterSprite 組件 ────────────────────────────────────────
-
-interface LobsterSpriteProps { classColor: string; size?: number }
-
-function LobsterSprite({ classColor, size = 192 }: LobsterSpriteProps) {
+function LobsterSprite({ classColor, size = 160 }: { classColor: string; size?: number }) {
   const COLS = 12, ROWS = 14
   const px = size / COLS
-
   const colorMap: Record<string, string> = {
-    A: '#94a3b8',
-    H: classColor,
-    W: '#ffffff',
-    C: classColor,
-    B: classColor,
-    T: classColor,
-    X: 'rgba(255,255,255,0.25)',
+    A: '#94a3b8', H: classColor, W: '#ffffff',
+    C: classColor, B: classColor, T: classColor, X: 'rgba(255,255,255,0.25)',
   }
   const opacityMap: Record<string, number> = {
     A: 0.9, H: 1, W: 1, C: 0.72, B: 1, T: 0.82, X: 1
   }
-
   return (
-    <svg
-      width={size} height={ROWS * px}
-      viewBox={`0 0 ${size} ${ROWS * px}`}
+    <svg width={size} height={ROWS * px} viewBox={`0 0 ${size} ${ROWS * px}`}
       style={{ imageRendering: 'pixelated', display: 'block', margin: '0 auto' }}
-      className="lobster-sprite"
-    >
+      className="lobster-sprite">
       <defs>
         <filter id="lobster-glow" x="-30%" y="-30%" width="160%" height="160%">
           <feGaussianBlur stdDeviation="3" result="blur"/>
@@ -207,10 +184,7 @@ function LobsterSprite({ classColor, size = 192 }: LobsterSpriteProps) {
       </defs>
       <g filter="url(#lobster-glow)">
         {LOBSTER_PIXELS.map(([col, row, type], i) => (
-          <rect
-            key={i}
-            x={col * px} y={row * px}
-            width={px} height={px}
+          <rect key={i} x={col * px} y={row * px} width={px} height={px}
             fill={colorMap[type] ?? classColor}
             opacity={opacityMap[type] ?? 1}
             className={type === 'W' ? 'lobster-eye' : undefined}
@@ -220,6 +194,11 @@ function LobsterSprite({ classColor, size = 192 }: LobsterSpriteProps) {
     </svg>
   )
 }
+
+// ── SoulWeb (kept, not rendered) ──────────────────────────────
+
+interface SoulWebProps { stats: Stats; classColor: string; size?: number }
+function SoulWeb(_props: SoulWebProps) { return null }
 
 // ── Formulas ──────────────────────────────────────────────────
 
@@ -236,85 +215,42 @@ function xpToNext(xp: number, level: number): number {
   if (level >= 999) return 0
   return xpForLevel(level + 1) - xp
 }
-function mod(val: number): number { return Math.floor((val - 10) / 2) }
-function modStr(val: number): string { const m = mod(val); return (m >= 0 ? '+' : '') + m }
 function fmtNum(n: number): string { return n.toLocaleString() }
 function fmtSign(n: number): string { return (n >= 0 ? '+' : '') + n }
 
-// ── SoulWeb SVG Component（保留定義，不使用）─────────────────
+// ── Speaker Component ─────────────────────────────────────────
 
-interface SoulWebProps { stats: Stats; classColor: string; size?: number }
-
-function SoulWeb({ stats, classColor, size = 280 }: SoulWebProps) {
-  const cx = size / 2, cy = size / 2, R = size * 0.38, maxVal = 20
-  const angles = [-90, -30, 30, 90, 150, 210]
-
-  function hexPath(fraction: number): string {
-    return angles.map((a, i) => {
-      const ang = a * (Math.PI / 180)
-      const r = R * fraction
-      return `${i === 0 ? 'M' : 'L'}${cx + r * Math.cos(ang)},${cy + r * Math.sin(ang)}`
-    }).join(' ') + ' Z'
-  }
-
-  function dataPath(): string {
-    return STAT_KEYS.map((key, i) => {
-      const ang = angles[i] * (Math.PI / 180)
-      const val = stats[key as keyof Stats] ?? 10
-      const r = (val / maxVal) * R
-      return `${i === 0 ? 'M' : 'L'}${cx + r * Math.cos(ang)},${cy + r * Math.sin(ang)}`
-    }).join(' ') + ' Z'
-  }
-
-  function labelPos(idx: number): [number, number] {
-    const ang = angles[idx] * (Math.PI / 180)
-    const r = R + 26
-    return [cx + r * Math.cos(ang), cy + r * Math.sin(ang)]
-  }
-
+function Speaker({ color, delay = 0 }: { color: string; delay?: number }) {
   return (
-    <svg
-      width={size} height={size} viewBox={`0 0 ${size} ${size}`}
-      className="soul-web-breathe"
-      style={{ overflow: 'visible', display: 'block', margin: '0 auto' }}
-    >
-      <defs>
-        <filter id="soul-glow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="4" result="blur" />
-          <feFlood floodColor={classColor} floodOpacity="0.6" result="color" />
-          <feComposite in="color" in2="blur" operator="in" result="glow" />
-          <feMerge><feMergeNode in="glow" /><feMergeNode in="SourceGraphic" /></feMerge>
-        </filter>
-      </defs>
-      {[0.25, 0.5, 0.75, 1.0].map(f => (
-        <path key={f} d={hexPath(f)} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={1} />
-      ))}
-      {STAT_KEYS.map((_, i) => {
-        const ang = angles[i] * (Math.PI / 180)
-        return <line key={i} x1={cx} y1={cy}
-          x2={cx + R * Math.cos(ang)} y2={cy + R * Math.sin(ang)}
-          stroke="rgba(255,255,255,0.1)" strokeWidth={1} />
-      })}
-      <path d={dataPath()} fill={classColor} fillOpacity={0.25}
-        stroke={classColor} strokeWidth={2}
-        className="soul-web-polygon" filter="url(#soul-glow)" />
-      {STAT_KEYS.map((key, i) => {
-        const [lx, ly] = labelPos(i)
-        const info = STAT_INFO[key]
-        const val  = stats[key as keyof Stats] ?? 10
-        return (
-          <g key={key} textAnchor="middle">
-            <text x={lx} y={ly - 5} fontSize={10} fill="#94a3b8" dominantBaseline="auto">
-              {info.icon} {info.dnd}
-            </text>
-            <text x={lx} y={ly + 8} fontSize={10} fill={classColor} dominantBaseline="auto">
-              {val}({modStr(val)})
-            </text>
-          </g>
-        )
-      })}
-      <circle cx={cx} cy={cy} r={3} fill={classColor} />
-    </svg>
+    <div className="speaker-unit" style={{ animationDelay: `${delay}s` }}>
+      <svg width="58" height="58" viewBox="0 0 58 58">
+        <defs>
+          <radialGradient id={`sg-${delay}`} cx="38%" cy="32%" r="60%">
+            <stop offset="0%"   stopColor="#484860" />
+            <stop offset="40%"  stopColor="#1e1e2e" />
+            <stop offset="100%" stopColor="#080810" />
+          </radialGradient>
+          <radialGradient id={`sc-${delay}`} cx="50%" cy="50%" r="50%">
+            <stop offset="0%"   stopColor="#2a2a3a" />
+            <stop offset="100%" stopColor="#0a0a14" />
+          </radialGradient>
+        </defs>
+        {/* Outer ring */}
+        <circle cx="29" cy="29" r="27" fill={`url(#sg-${delay})`} />
+        <circle cx="29" cy="29" r="27" fill="none" stroke="#555" strokeWidth="1.5" />
+        {/* Highlight */}
+        <ellipse cx="22" cy="18" rx="10" ry="6" fill="rgba(255,255,255,0.06)" />
+        {/* Mid ring */}
+        <circle cx="29" cy="29" r="19" fill="none" stroke="#3a3a4a" strokeWidth="1" />
+        {/* Inner cone */}
+        <circle cx="29" cy="29" r="13" fill={`url(#sc-${delay})`} />
+        <circle cx="29" cy="29" r="13" fill="none" stroke="#2a2a3a" strokeWidth="1" />
+        {/* Center dot */}
+        <circle cx="29" cy="29" r="5" fill="#111118" stroke="#333" strokeWidth="1" />
+        {/* Color ring glow */}
+        <circle cx="29" cy="29" r="27" fill="none" stroke={color} strokeWidth="1.5" opacity="0.35" />
+      </svg>
+    </div>
   )
 }
 
@@ -340,17 +276,12 @@ export default function App() {
   }, [])
 
   if (loading) return (
-    <div className="center-msg">
-      <h2>🦞 Loading…</h2>
-    </div>
+    <div className="center-msg"><h2>🦞 Loading…</h2></div>
   )
-
   if (error || !char) return (
     <div className="center-msg">
       <h2>No character found</h2>
-      <p>Initialize first:</p><br />
-      <code>node scripts/init.mjs</code><br /><br />
-      <p style={{ color: '#475569', fontSize: 13 }}>Dashboard auto-connects via SSE</p>
+      <p>Run: <code>node scripts/init.mjs</code></p>
     </div>
   )
 
@@ -359,173 +290,218 @@ export default function App() {
   const title      = TITLES[Math.min(char.prestige, TITLES.length - 1)]
   const progress   = levelProgress(char.xp, char.level)
   const toNext     = xpToNext(char.xp, char.level)
+  const mbti       = deriveMBTI(char.stats, char.bab ?? 0)
+  const mbtiName   = MBTI_NAMES[mbti] ?? ''
+  const alignment  = deriveAlignment(char.stats)
+  const rarity     = getRarity(char.level)
+  const catchphrase = CATCHPHRASES[char.class] ?? 'Ready.'
+  const rune       = CLASS_RUNE[char.class] ?? '🦞'
+  const feats      = char.feats ?? []
+  const abilities  = char.abilities ?? []
+  const saves      = char.saves ?? { fort: 0, ref: 0, will: 0 }
 
-  // WC3 計算區
-  const mbti        = deriveMBTI(char.stats, char.bab ?? 0)
-  const mbtiName    = MBTI_NAMES[mbti] ?? ''
-  const alignment   = deriveAlignment(char.stats)
-  const rarity      = getRarity(char.level)
-  const catchphrase = CATCHPHRASES[char.class] ?? "Ready for anything."
-  const rune        = CLASS_RUNE[char.class] ?? '🦞'
-
-  // 抑制 SoulWeb 未使用警告（保留定義但不渲染）
   void (SoulWeb as unknown)
 
+  const EQ_SEGS = 14
+
   return (
-    <div className="page-bg">
-      <div className="card-wrap">
-        <div className="card" style={{
-          '--class-color': classColor,
-          '--rarity-color': rarity.color,
-          '--rarity-glow': rarity.glow,
-        } as React.CSSProperties}>
+    <div className="page-wrap" style={{
+      '--class-color': classColor,
+      '--rarity-color': rarity.color,
+    } as React.CSSProperties}>
 
-          {/* 稀有度 */}
-          <div className={`rarity-badge${rarity.label === 'MYTHIC' ? ' mythic-rarity' : ''}`}
-            style={{ color: rarity.color }}>{rarity.label}</div>
+      {/* ════════════════════════════════════════════════════
+          WINAMP GRID — head spans rows 1-3, wings row 2 only
+          ════════════════════════════════════════════════════ */}
+      <div className="winamp-grid">
 
-          {/* 等級水晶 */}
-          <div className="level-crystal">{char.level}</div>
+        {/* ── Left speakers (col 1, rows 1-3) ── */}
+        <div className="spk-col spk-left">
+          <Speaker color={classColor} delay={0} />
+          <Speaker color={classColor} delay={0.4} />
+          <Speaker color={classColor} delay={0.8} />
+        </div>
 
-          {/* 姓名橫幅 */}
-          <div className="name-banner">
-            <span className="name-text">{char.name}</span>
+        {/* ── Left EQ wing (col 2, row 2 ONLY) ── */}
+        <div className="wing wing-left">
+          <div className="wing-hdr">EQUALIZER</div>
+
+          {/* 6 stat EQ bars */}
+          <div className="eq-bars">
+            {STAT_KEYS.map(k => {
+              const val   = char.stats[k as keyof Stats] ?? 10
+              const color = STAT_COLORS[k]
+              const lit   = Math.round((val / 20) * EQ_SEGS)
+              return (
+                <div className="eq-col" key={k}>
+                  <div className="eq-track">
+                    {Array.from({ length: EQ_SEGS }, (_, i) => (
+                      <div key={i}
+                        className={`eq-seg${EQ_SEGS - 1 - i < lit ? ' lit' : ''}`}
+                        style={{ '--seg-color': color } as React.CSSProperties}
+                      />
+                    ))}
+                  </div>
+                  <div className="eq-lbl" style={{ color }}>{STAT_INFO[k].dnd}</div>
+                  <div className="eq-val">{val}</div>
+                </div>
+              )
+            })}
           </div>
 
-          {/* 像素龍蝦（替換雷達圖）*/}
-          <div className="portrait-frame">
-            <div className="class-rune-bg">{rune}</div>
-            <LobsterSprite classColor={classColor} size={192} />
+          {/* Save sliders */}
+          <div className="saves-section">
+            {[
+              { l: 'FORT', v: saves.fort ?? 0 },
+              { l: 'REF',  v: saves.ref  ?? 0 },
+              { l: 'WILL', v: saves.will ?? 0 },
+            ].map(s => (
+              <div className="save-row" key={s.l}>
+                <span className="save-lbl">{s.l}</span>
+                <div className="save-track">
+                  <div className="save-fill"
+                    style={{ width: `${Math.min(100, Math.max(5, ((s.v + 12) / 24) * 100))}%` }} />
+                  <div className="save-thumb"
+                    style={{ left: `${Math.min(95, Math.max(2, ((s.v + 12) / 24) * 100))}%` }} />
+                </div>
+                <span className="save-val">{fmtSign(s.v)}</span>
+              </div>
+            ))}
           </div>
 
-          {/* 職業橫幅 */}
-          <div className="class-banner">{cls.icon} {cls.en}</div>
-
-          {/* 描述框 */}
-          <div className="desc-box">
-
-            {/* 1. MBTI */}
-            <div className="mbti-section">
-              <div className="mbti-code" style={{ color: classColor,
-                textShadow: `0 0 12px ${classColor}, 0 0 30px ${classColor}` }}>
-                {mbti}
+          {/* HP / AC / BAB strip at bottom */}
+          <div className="wing-stats-row">
+            {[
+              { l: 'HP',  v: char.hp   ?? '—' },
+              { l: 'AC',  v: char.ac   ?? '—' },
+              { l: 'BAB', v: char.bab  != null ? fmtSign(char.bab) : '—' },
+            ].map(s => (
+              <div className="wing-stat" key={s.l}>
+                <span className="ws-val" style={{ color: classColor }}>{String(s.v)}</span>
+                <span className="ws-lbl">{s.l}</span>
               </div>
-              <div className="mbti-sub">
-                <span className="mbti-name-text">{mbtiName}</span>
-                <span className="mbti-dot"> · </span>
-                <span className="alignment-text">{alignment}</span>
+            ))}
+          </div>
+        </div>
+
+        {/* ══════════════════════════════════════════════════
+            CENTER: ALIEN HEAD (col 3, rows 1-3)
+            Taller than wings — protrudes above and below
+            ══════════════════════════════════════════════════ */}
+        <div className="alien-head">
+
+          {/* ── TOP ZONE (row 1): transport controls ── */}
+          <div className="head-top">
+            <div className="head-title-bar">CLAW RPG</div>
+            <div className="transport-row">
+              <div className="tport-btn">
+                {char.prestige > 0 ? `★${char.prestige}` : '◀◀'}
               </div>
+              <div className="tport-btn cls-icon">{cls.icon}</div>
+              <div className="tport-btn lvl-num">{char.level}</div>
+              <div className="tport-btn rar-tag"
+                style={{ color: rarity.color, textShadow: `0 0 8px ${rarity.color}` }}>
+                {rarity.label.slice(0,3)}
+              </div>
+              <div className="tport-btn xp-pct">{progress}%</div>
             </div>
+          </div>
 
-            <div className="divider" />
-
-            {/* 2. 名言 */}
-            <div className="quote-section">
-              <span className="cq-mark">❝</span>
-              <span className="cq-text">{catchphrase}</span>
-              <span className="cq-mark">❞</span>
+          {/* ── MIDDLE ZONE (row 2): CRT screen ── */}
+          <div className="head-middle">
+            <div className="crt-monitor">
+              <div className="crt-scanlines" />
+              <div className="crt-rune">{rune}</div>
+              <LobsterSprite classColor={classColor} size={160} />
             </div>
-
-            <div className="divider" />
-
-            {/* 3. 核心數值 */}
-            <div className="key-stats-section">
-              <div className="ks-row">
-                {[
-                  { l: 'HP',   v: char.hp   ?? '—' },
-                  { l: 'AC',   v: char.ac   ?? '—' },
-                  { l: 'BAB',  v: char.bab  != null ? fmtSign(char.bab) : '—' },
-                  { l: 'INIT', v: char.initiative != null ? fmtSign(char.initiative) : '—' },
-                ].map(s => (
-                  <div className="ks-cell" key={s.l}>
-                    <div className="ks-val" style={{ color: classColor,
-                      textShadow: `0 0 8px ${classColor}` }}>{String(s.v)}</div>
-                    <div className="ks-label">{s.l}</div>
-                  </div>
-                ))}
-              </div>
-              <div className="ks-row ks-saves">
-                {[
-                  { l: 'FORT', v: char.saves?.fort != null ? fmtSign(char.saves.fort) : '—' },
-                  { l: 'REF',  v: char.saves?.ref  != null ? fmtSign(char.saves.ref)  : '—' },
-                  { l: 'WILL', v: char.saves?.will != null ? fmtSign(char.saves.will) : '—' },
-                ].map(s => (
-                  <div className="ks-cell wide" key={s.l}>
-                    <div className="ks-val">{s.v}</div>
-                    <div className="ks-label">{s.l}</div>
-                  </div>
-                ))}
-              </div>
+            <div className="head-id-row">
+              <span className="head-mbti" style={{
+                color: classColor,
+                textShadow: `0 0 10px ${classColor}`
+              }}>{mbti}</span>
+              <span className="head-dot"> · </span>
+              <span className="head-align">{alignment}</span>
             </div>
+            <div className="head-mbti-name">{mbtiName}</div>
+          </div>
 
-            <div className="divider" />
+          {/* ── BOTTOM ZONE (row 3): chin / name ── */}
+          <div className="head-bottom">
+            <div className="head-name" style={{
+              color: '#fff',
+              textShadow: `0 0 8px #fff, 0 0 24px ${classColor}`
+            }}>{char.name}</div>
+            <div className="head-class-line">
+              {cls.icon} <span style={{ color: classColor }}>{cls.en}</span>
+            </div>
+            <div className="head-quote">"{catchphrase}"</div>
+            <div className="xp-bar-outer">
+              <div className="xp-bar-inner" style={{ width: `${progress}%` }} />
+            </div>
+            <div className="xp-row">
+              <span>{fmtNum(char.xp)} XP</span>
+              <span>{char.level < 999 ? `${fmtNum(toNext)} to Lv.${char.level + 1}` : 'MAX'}</span>
+            </div>
+            <div className="live-badge">⚡ {title} · LIVE {char.updatedAt?.slice(11,16)}</div>
+          </div>
 
-            {/* 4. 職業能力圖標 */}
-            <div className="ability-icons-grid">
-              {(char.abilities ?? []).map((ab, i) => (
-                <div className="ab-icon-chip" key={ab}
-                  style={{ borderColor: classColor + '60', background: classColor + '18' }}>
-                  <span className="ab-icon-emoji">{ABILITY_ICONS[char.class]?.[i] ?? '⚡'}</span>
-                  <span className="ab-icon-name" style={{ color: classColor }}>{ab}</span>
+        </div>{/* .alien-head */}
+
+        {/* ── Right playlist wing (col 4, row 2 ONLY) ── */}
+        <div className="wing wing-right">
+          <div className="wing-hdr">
+            FEATS
+            <span className="feat-count">{String(feats.length).padStart(2, '0')}</span>
+          </div>
+
+          <div className="playlist">
+            {feats.length === 0
+              ? <div className="pl-empty">— no feats —</div>
+              : feats.map((f, i) => (
+                <div key={f} className={`pl-row${i === 0 ? ' pl-active' : ''}`}>
+                  <span className="pl-idx">{String(i + 1).padStart(2, '0')}</span>
+                  <span className="pl-name">{f.length > 21 ? f.slice(0, 20) + '…' : f}</span>
+                </div>
+              ))
+            }
+          </div>
+
+          <div className="abil-section">
+            <div className="abil-hdr">ABILITIES</div>
+            <div className="abil-grid">
+              {abilities.slice(0, 4).map((ab, i) => (
+                <div key={ab} className="abil-chip"
+                  style={{ '--chip-color': classColor } as React.CSSProperties}>
+                  <span className="abil-icon">{ABILITY_ICONS[char.class]?.[i] ?? '⚡'}</span>
+                  <span className="abil-name">{ab.length > 13 ? ab.slice(0,12)+'…' : ab}</span>
                 </div>
               ))}
             </div>
-
-            <div className="divider" />
-
-            {/* 5. 六屬性小行 */}
-            <div className="mini-stat-row">
-              {STAT_KEYS.map(k => {
-                const val = char.stats[k as keyof Stats] ?? 10
-                return (
-                  <div className="mini-stat" key={k}
-                    style={{ '--pip-color': STAT_COLORS[k] } as React.CSSProperties}>
-                    <div className="ms-val">{val}</div>
-                    <div className="ms-mod">{modStr(val)}</div>
-                    <div className="ms-label">{STAT_INFO[k].dnd}</div>
-                  </div>
-                )
-              })}
-            </div>
-
-          </div>{/* .desc-box */}
-
-          {/* 底部寶石 */}
-          <div className="card-footer">
-            <div className="gem gem-atk">
-              <span className="gem-val">{char.bab != null ? fmtSign(char.bab) : '—'}</span>
-              <span className="gem-label">BAB</span>
-            </div>
-            <div className="footer-center">
-              <div className="footer-title">{title}</div>
-              {char.prestige > 0 && (
-                <div className="footer-prestige">✦ Prestige {char.prestige}</div>
-              )}
-            </div>
-            <div className="gem gem-hp">
-              <span className="gem-val">{char.hp ?? '—'}</span>
-              <span className="gem-label">HP</span>
-            </div>
           </div>
 
-        </div>{/* .card */}
-
-        {/* XP 條 */}
-        <div className="xp-bar-outer">
-          <div className="xp-bar-inner"
-            style={{ width: `${progress}%`, '--bar-color': rarity.color } as React.CSSProperties} />
+          {/* INIT / WILL corner stats */}
+          <div className="wing-stats-row">
+            {[
+              { l: 'INIT', v: char.initiative != null ? fmtSign(char.initiative) : '—' },
+              { l: 'WILL', v: saves.will != null ? fmtSign(saves.will) : '—' },
+              { l: 'XP',   v: `${progress}%` },
+            ].map(s => (
+              <div className="wing-stat" key={s.l}>
+                <span className="ws-val" style={{ color: classColor }}>{s.v}</span>
+                <span className="ws-lbl">{s.l}</span>
+              </div>
+            ))}
+          </div>
         </div>
-        <div className="xp-label-row">
-          <span>{fmtNum(char.xp)} XP</span>
-          <span>
-            {char.level < 999
-              ? `${progress}% · ${fmtNum(toNext)} to Lv.${char.level + 1}`
-              : '🌟 Max Level!'}
-          </span>
-        </div>
-        <div className="live-badge">⚡ Live · {char.updatedAt?.slice(11,16)} UTC</div>
 
-      </div>
+        {/* ── Right speakers (col 5, rows 1-3) ── */}
+        <div className="spk-col spk-right">
+          <Speaker color={classColor} delay={0.2} />
+          <Speaker color={classColor} delay={0.6} />
+          <Speaker color={classColor} delay={1.0} />
+        </div>
+
+      </div>{/* .winamp-grid */}
     </div>
   )
 }
