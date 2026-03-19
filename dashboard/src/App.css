@@ -31,34 +31,15 @@ body {
 
 .wg {
   display: grid;
-  grid-template-columns: 70px 230px 300px 230px 70px;
+  grid-template-columns: 230px 300px 230px;
   grid-template-rows: 110px 280px 160px;
-  /* No gap — pieces must touch for seamless look */
   gap: 0;
 }
 
 /* ──────────────────────────────────────────────
    Speaker columns: full height, dark metallic
    ────────────────────────────────────────────── */
-.spk-col {
-  background: linear-gradient(180deg, #111020 0%, #0c0a1a 50%, #080614 100%);
-  border: 1px solid #222230;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 16px;
-}
-.spk-l { grid-column: 1; grid-row: 1 / 4; border-right: none; }
-.spk-r { grid-column: 5; grid-row: 1 / 4; border-left: none; }
 
-.speaker-unit {
-  animation: spk-pulse 2.6s ease-in-out infinite;
-}
-@keyframes spk-pulse {
-  0%, 100% { transform: scale(1);    opacity: 0.8; }
-  50%       { transform: scale(1.05); opacity: 1;   }
-}
 
 /* ──────────────────────────────────────────────
    Wings: col 2 & 4, ROW 2 ONLY
@@ -84,8 +65,8 @@ body {
   pointer-events: none;
   z-index: 1;
 }
-.wl { grid-column: 2; grid-row: 2; border-right: 2px solid var(--cc, #14b8a6); }
-.wr { grid-column: 4; grid-row: 2; border-left:  2px solid var(--cc, #14b8a6); }
+.wl { grid-column: 1; grid-row: 2; border-right: 2px solid var(--cc, #14b8a6); }
+.wr { grid-column: 3; grid-row: 2; border-left:  2px solid var(--cc, #14b8a6); }
 
 .wing-hdr {
   font-size: 8px;
@@ -187,7 +168,7 @@ body {
    Content zones are positioned on top.
    ══════════════════════════════════════════════════════════ */
 .head {
-  grid-column: 3;
+  grid-column: 2;
   grid-row: 1 / 4;
   position: relative;
   z-index: 2;

@@ -179,19 +179,6 @@ function AlienHeadShape({ color, width=300, height=550 }: { color:string; width?
     Z
   `
 
-  // Face zone: the chin area (y = 390px to 550px in a 550px head)
-  // Eyes sit at ~y=430, wide oval sockets
-  const eyeY   = h * 0.80        // 440px
-  const eyeRx  = w * 0.14        // 42px horizontal
-  const eyeRy  = h * 0.055       // 30px vertical
-  const eyeLx  = w * 0.30        // 90px  left eye center
-  const eyeRxC = w * 0.70        // 210px right eye center
-
-  // Nose bridge: thin vertical shape between eyes
-  const noseTop = h * 0.845
-  const noseMid = h * 0.875
-  const noseBtm = h * 0.910
-
   return (
     <svg
       viewBox={`0 0 ${w} ${h}`}
@@ -220,13 +207,7 @@ function AlienHeadShape({ color, width=300, height=550 }: { color:string; width?
           <feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
 
-        {/* Eye inner glow */}
-        <filter id="eglow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="5" result="blur"/>
-          <feFlood floodColor={color} floodOpacity="0.5" result="c"/>
-          <feComposite in="c" in2="blur" operator="in" result="g"/>
-          <feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
+
       </defs>
 
       {/* ── 1. Head fill ── */}
@@ -250,62 +231,9 @@ function AlienHeadShape({ color, width=300, height=550 }: { color:string; width?
       <ellipse cx={w*0.88} cy={h*0.65} rx={w*0.08} ry={h*0.04}
         fill="rgba(255,255,255,0.04)"/>
 
-      {/* ══════════════════════════════════════════
-          FACE AREA — the KEY alien visual element
-          Eyes, nose, chin in the lower 30% of head
-          ══════════════════════════════════════════ */}
-
-      {/* Face zone background (slightly different from head fill) */}
-      <clipPath id="faceClip">
-        <path d={head}/>
-      </clipPath>
-
-      {/* Face skin / shading */}
-      <ellipse cx={w*0.5} cy={h*0.85} rx={w*0.42} ry={h*0.17}
-        fill={color} fillOpacity="0.04" clipPath="url(#faceClip)"/>
-
-      {/* ── LEFT EYE ── */}
-      {/* Socket (deep dark hollow) */}
-      <ellipse cx={eyeLx} cy={eyeY} rx={eyeRx} ry={eyeRy}
-        fill="#020108" clipPath="url(#faceClip)"/>
-      {/* Socket rim (glowing ring) */}
-      <ellipse cx={eyeLx} cy={eyeY} rx={eyeRx} ry={eyeRy}
-        fill="none" stroke={color} strokeWidth="1.5"
-        filter="url(#eglow)" clipPath="url(#faceClip)"/>
-      {/* Iris glow (inner brighter area) */}
-      <ellipse cx={eyeLx} cy={eyeY} rx={eyeRx*0.5} ry={eyeRy*0.55}
-        fill={color} fillOpacity="0.18" clipPath="url(#faceClip)"/>
-      {/* Pupil */}
-      <ellipse cx={eyeLx} cy={eyeY} rx={eyeRx*0.22} ry={eyeRy*0.28}
-        fill={color} fillOpacity="0.5" clipPath="url(#faceClip)"/>
-      {/* Eye highlight (top-left sparkle) */}
-      <ellipse cx={eyeLx - eyeRx*0.3} cy={eyeY - eyeRy*0.3}
-        rx={eyeRx*0.18} ry={eyeRy*0.2}
-        fill="rgba(255,255,255,0.35)" clipPath="url(#faceClip)"/>
-
-      {/* ── RIGHT EYE ── */}
-      <ellipse cx={eyeRxC} cy={eyeY} rx={eyeRx} ry={eyeRy}
-        fill="#020108" clipPath="url(#faceClip)"/>
-      <ellipse cx={eyeRxC} cy={eyeY} rx={eyeRx} ry={eyeRy}
-        fill="none" stroke={color} strokeWidth="1.5"
-        filter="url(#eglow)" clipPath="url(#faceClip)"/>
-      <ellipse cx={eyeRxC} cy={eyeY} rx={eyeRx*0.5} ry={eyeRy*0.55}
-        fill={color} fillOpacity="0.18" clipPath="url(#faceClip)"/>
-      <ellipse cx={eyeRxC} cy={eyeY} rx={eyeRx*0.22} ry={eyeRy*0.28}
-        fill={color} fillOpacity="0.5" clipPath="url(#faceClip)"/>
-      <ellipse cx={eyeRxC - eyeRx*0.3} cy={eyeY - eyeRy*0.3}
-        rx={eyeRx*0.18} ry={eyeRy*0.2}
-        fill="rgba(255,255,255,0.35)" clipPath="url(#faceClip)"/>
-
-      {/* ── NOSE ── (subtle vertical ridge between eyes) */}
-      <path d={`M ${w*0.5},${noseTop} Q ${w*0.46},${noseMid} ${w*0.48},${noseBtm}
-                M ${w*0.5},${noseTop} Q ${w*0.54},${noseMid} ${w*0.52},${noseBtm}`}
-        fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="1.5"
-        clipPath="url(#faceClip)"/>
-
       {/* ── CHIN shadow ── */}
       <ellipse cx={w*0.5} cy={h*0.95} rx={w*0.2} ry={h*0.025}
-        fill="rgba(0,0,0,0.45)" clipPath="url(#faceClip)"/>
+        fill="rgba(0,0,0,0.45)"/>
     </svg>
   )
 }
@@ -387,8 +315,7 @@ export default function App() {
       */}
       <div className="wg">
 
-        {/* ─── Left side column: col 1, full height ─── */}
-        <div className="spk-col spk-l"/>
+
 
         {/* ─── Left EQ wing: col 2, ROW 2 ONLY ─── */}
         <div className="wing wl">
@@ -539,8 +466,7 @@ export default function App() {
           </div>
         </div>
 
-        {/* ─── Right side column: col 5, full height ─── */}
-        <div className="spk-col spk-r"/>
+
 
       </div>{/* .wg */}
     </div>
