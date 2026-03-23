@@ -5,3 +5,5 @@ node_modules/
 dashboard/node_modules/
 dashboard/dist/
 *.skill
+
+session-snapshot.json
