@@ -152,15 +152,22 @@ body {
   text-transform: uppercase;
   font-weight: 600;
 }
-.lp-title {
-  font-size: clamp(7px, 0.65vw, 9px);
-  color: rgba(0,255,65,0.55);
+.lp-init {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.lp-init-label {
+  font-size: clamp(6px, 0.6vw, 8px);
+  color: rgba(0,255,65,0.38);
   letter-spacing: 2px;
   text-transform: uppercase;
 }
-.lp-rank-prefix {
-  color: rgba(0,255,65,0.28);
-  letter-spacing: 1.5px;
+.lp-init-val {
+  font-size: clamp(8px, 0.8vw, 11px);
+  color: rgba(0,255,65,0.75);
+  font-weight: 700;
+  letter-spacing: 1px;
 }
 .lp-xp { display: flex; flex-direction: column; gap: 4px; width: 94%; }
 .lp-xpbar {
@@ -194,15 +201,74 @@ body {
 .lp-xp-sep  { color: rgba(0,255,65,0.3); }
 .lp-xp-next { color: rgba(0,255,65,0.55); }
 
-/* ══ RIGHT PANEL ══ */
-.rp-section-label {
-  font-size: clamp(6px, 0.58vw, 8px);
+/* ══ RIGHT PANEL — tighter spacing ══ */
+.skin-right {
+  gap: 2.5%;
+  padding: 4% 4%;
+}
+
+/* ── feats section ── */
+.rp-feats-label {
+  font-size: clamp(6px, 0.56vw, 7.5px);
   color: rgba(0,255,65,0.35);
   letter-spacing: 2.5px;
   text-transform: uppercase;
   text-align: center;
   width: 100%;
 }
+.rp-feats {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  width: 100%;
+}
+.rp-feat-item {
+  font-size: clamp(6px, 0.6vw, 8px);
+  color: rgba(0,255,65,0.7);
+  letter-spacing: 0.8px;
+  text-align: left;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── tokens section ── */
+.rp-tokens {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  width: 100%;
+}
+.rp-token-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  flex: 1;
+}
+.rp-token-label {
+  font-size: clamp(6px, 0.56vw, 7.5px);
+  color: rgba(0,255,65,0.4);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.rp-token-val {
+  font-size: clamp(12px, 1.4vw, 17px);
+  color: #ffffff;
+  font-weight: 800;
+  line-height: 1;
+  text-shadow: 0 0 10px #00ff41, 0 0 20px rgba(0,255,65,0.25);
+}
+.rp-tvline {
+  width: 1px;
+  height: 26px;
+  background: linear-gradient(180deg,
+    transparent, rgba(0,255,65,0.3) 30%,
+    rgba(0,255,65,0.3) 70%, transparent);
+  flex-shrink: 0;
+}
+
 .rp-combat {
   display: flex;
   align-items: center;
@@ -225,7 +291,7 @@ body {
   flex-shrink: 0;
 }
 .rp-cv {
-  font-size: clamp(14px, 1.7vw, 22px);
+  font-size: clamp(13px, 1.55vw, 20px);
   color: #ffffff;
   font-weight: 900;
   line-height: 1;
@@ -257,9 +323,9 @@ body {
   text-transform: uppercase;
 }
 .rp-sv {
-  font-size: clamp(12px, 1.5vw, 18px);
+  font-size: clamp(13px, 1.55vw, 20px);
   color: #ffffff;
-  font-weight: 800;
+  font-weight: 900;
   line-height: 1;
   text-shadow: 0 0 10px #00ff41, 0 0 20px rgba(0,255,65,0.25);
 }

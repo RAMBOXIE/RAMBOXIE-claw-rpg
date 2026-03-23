@@ -47,11 +47,7 @@ const CATCHPHRASES: Record<string, string> = {
   wizard:"I've read 17 books on this mistake.",
   sorcerer:'Born with it. Not learned.',
 }
-const TITLES = [
-  'Apprentice','Warrior Lobster','Knight Lobster','Commander Lobster',
-  'General Lobster','Legendary Lobster','Mythic Lobster','Epic Lobster',
-  'Ancient Lobster','Eternal Lobster','Chaos Lobster',
-]
+
 
 // ── Helpers ──────────────────────────────────────────────────────
 function xpForLevel(n: number) { return n <= 1 ? 0 : (n*(n-1)/2)*1000 }
@@ -63,7 +59,6 @@ function levelProgress(xp: number, level: number) {
 function xpToNext(xp: number, level: number) {
   return level >= 999 ? 0 : xpForLevel(level+1)-xp
 }
-function fmtSign(n: number) { return (n>=0?'+':'')+n }
 function fmtStat(n: number) { return n >= 10000 ? (n/1000).toFixed(1)+'k' : String(n) }
 function fmtShort(n: number) { return n >= 10000 ? Math.round(n/1000)+'K' : n >= 1000 ? (n/1000).toFixed(1)+'K' : String(n) }
 
@@ -104,15 +99,6 @@ const PIXEL_SWORD: PxMap = [
   [3,1],[3,2],[3,3],[3,4],
   [0,5],[1,5],[2,5],[3,5],[4,5],[5,5],[6,5],
   [3,6],[3,7],
-]
-const PIXEL_CHAT: PxMap = [
-  [1,0],[2,0],[3,0],[4,0],[5,0],[6,0],
-  [0,1],[7,1],
-  [0,2],[7,2],
-  [0,3],[7,3],
-  [1,4],[2,4],[3,4],[4,4],[5,4],[6,4],
-  [2,5],
-  [1,6],
 ]
 
 function PixelIcon({ pixels, color, size=14 }: { pixels: PxMap; color: string; size?: number }) {
@@ -204,7 +190,6 @@ export default function App() {
   const toNext       = xpToNext(char.xp, char.level)
   const mbti         = deriveMBTI(char.stats, char.bab??0)
   const alignment    = deriveAlignment(char.stats)
-  const title        = TITLES[Math.min(char.prestige, TITLES.length-1)]
   const phrase       = CATCHPHRASES[char.class] ?? 'Ready.'
   const saves        = char.saves ?? { fort:0, ref:0, will:0 }
 
@@ -268,7 +253,12 @@ export default function App() {
             {char.level >= 999 && <span className="lp-xp-next"> MAX</span>}
           </div>
         </div>
-        <div className="lp-title"><span className="lp-rank-prefix">RANK · </span>{title}</div>
+        {char.initiative != null && (
+          <div className="lp-init">
+            <span className="lp-init-label">INITIATIVE</span>
+            <span className="lp-init-val">{char.initiative >= 0 ? `+${char.initiative}` : char.initiative}</span>
+          </div>
+        )}
       </div>
 
       {/* ════════════════════════════════════════════════════════
@@ -276,7 +266,8 @@ export default function App() {
           Most viral: HP / AC / BAB + saves
           ════════════════════════════════════════════════════════ */}
       <div className="skin-panel skin-right" style={pct(835,240,290,232)}>
-        <div className="rp-section-label">COMBAT</div>
+
+        {/* ── HP / AC / BAB ── */}
         <div className="rp-combat">
           <div className="rp-cstat">
             <span className="rp-cl"><PixelIcon pixels={PIXEL_HEART} color="#ff4466" size={10}/> HP</span>
@@ -290,24 +281,44 @@ export default function App() {
           <div className="rp-vline"/>
           <div className="rp-cstat">
             <span className="rp-cl"><PixelIcon pixels={PIXEL_SWORD} color="#ffdd44" size={10}/> BAB</span>
-            <span className="rp-cv">{char.bab != null ? fmtSign(char.bab) : '—'}</span>
+            <span className="rp-cv">{char.bab ?? '—'}</span>
           </div>
         </div>
         <div className="panel-rule"/>
-        <div className="rp-section-label">SAVING THROWS</div>
+
+        {/* ── FORT / REF / WILL ── */}
         <div className="rp-saves">
-          {([['FORT',saves.fort??0],['REF',saves.ref??0],['WILL',saves.will??0]] as [string,number][]).map(([l,v])=>(
+          {([['FORT', saves.fort??0],['REF', saves.ref??0],['WILL', saves.will??0]] as [string,number][]).map(([l,v])=>(
             <div key={l} className="rp-save">
               <span className="rp-sl">{l}</span>
-              <span className="rp-sv">{fmtSign(v)}</span>
+              <span className="rp-sv">{v}</span>
             </div>
           ))}
         </div>
         <div className="panel-rule"/>
-        <div className="rp-footer">
-          <PixelIcon pixels={PIXEL_CHAT} color="#44ff88" size={10}/>
-          <span>{char.conversations ?? 0} MESSAGES</span>
+
+        {/* ── CLASS FEATURES ── */}
+        <div className="rp-feats-label">CLASS FEATURES</div>
+        <div className="rp-feats">
+          {(char.abilities || []).map((a: string, i: number) => (
+            <div key={i} className="rp-feat-item">· {a}</div>
+          ))}
         </div>
+        <div className="panel-rule"/>
+
+        {/* ── TOKENS IN / OUT ── */}
+        <div className="rp-tokens">
+          <div className="rp-token-item">
+            <span className="rp-token-label">↓ TOKENS IN</span>
+            <span className="rp-token-val">{fmtShort(char.tokens?.consumed ?? 0)}</span>
+          </div>
+          <div className="rp-tvline"/>
+          <div className="rp-token-item">
+            <span className="rp-token-label">↑ TOKENS OUT</span>
+            <span className="rp-token-val">{fmtShort(char.tokens?.produced ?? 0)}</span>
+          </div>
+        </div>
+
       </div>
 
       {/* ════════════════════════════════════════════════════════
