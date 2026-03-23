@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react'
+﻿import { useEffect, useRef, useState } from 'react'
 import './App.css'
 
 // ── Types ────────────────────────────────────────────────────────
@@ -162,9 +162,70 @@ function LobsterSprite({ classColor, size=160 }: { classColor: string; size?: nu
   )
 }
 
+// ── Matrix Rain ──────────────────────────────────────────────────
+function MatrixRain() {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  useEffect(() => {
+    const canvas = canvasRef.current!
+    const ctx    = canvas.getContext('2d')!
+    const CHARS  = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<>{}[]|/\\!@#$%^&*()-=_+;:,.?~`'
+    const FS     = 13
+    let cols     = 0
+    let drops:   number[] = []
+
+    const resize = () => {
+      canvas.width  = window.innerWidth
+      canvas.height = window.innerHeight
+      cols  = Math.floor(canvas.width / FS)
+      // keep existing drops, extend if wider
+      while (drops.length < cols) drops.push(Math.random() * -50 | 0)
+      drops = drops.slice(0, cols)
+    }
+    resize()
+    window.addEventListener('resize', resize)
+
+    const draw = () => {
+      // fade trail
+      ctx.fillStyle = 'rgba(0,0,0,0.045)'
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      ctx.font = `${FS}px "Courier New", monospace`
+
+      for (let i = 0; i < cols; i++) {
+        const ch = CHARS[Math.random() * CHARS.length | 0]
+        const y  = drops[i] * FS
+
+        // bright head
+        ctx.fillStyle = '#afffaf'
+        ctx.fillText(ch, i * FS, y)
+
+        // body (slightly dimmer handled by fade)
+        if (y > FS) {
+          ctx.fillStyle = '#00cc33'
+          ctx.fillText(CHARS[Math.random() * CHARS.length | 0], i * FS, y - FS)
+        }
+
+        if (y > canvas.height && Math.random() > 0.975) drops[i] = 0
+        else drops[i]++
+      }
+    }
+
+    const id = setInterval(draw, 45)
+    return () => { clearInterval(id); window.removeEventListener('resize', resize) }
+  }, [])
+
+  return (
+    <canvas ref={canvasRef} style={{
+      position: 'fixed', inset: 0,
+      width: '100%', height: '100%',
+      zIndex: 0, pointerEvents: 'none',
+    }}/>
+  )
+}
+
 // ── App ──────────────────────────────────────────────────────────
 export default function App() {
   const [char, setChar]       = useState<Character|null>(null)
+  const [skinUrl, setSkinUrl] = useState('/winamp-skin.jpg')
   const [loading, setLoading] = useState(true)
   const [error, setError]     = useState<string|null>(null)
 
@@ -179,6 +240,27 @@ export default function App() {
       try { const d=JSON.parse(e.data); setChar(d); setError(null); setLoading(false) } catch {}
     }
     return () => es.close()
+  }, [])
+
+  // Remove white background from the winamp skin JPG so matrix rain shows through
+  useEffect(() => {
+    const img = new Image()
+    img.onload = () => {
+      const c   = document.createElement('canvas')
+      c.width   = img.naturalWidth
+      c.height  = img.naturalHeight
+      const ctx = c.getContext('2d')!
+      ctx.drawImage(img, 0, 0)
+      const id  = ctx.getImageData(0, 0, c.width, c.height)
+      const d   = id.data
+      const THR = 235          // pixels whiter than this become transparent
+      for (let i = 0; i < d.length; i += 4) {
+        if (d[i] > THR && d[i+1] > THR && d[i+2] > THR) d[i+3] = 0
+      }
+      ctx.putImageData(id, 0, 0)
+      setSkinUrl(c.toDataURL('image/png'))
+    }
+    img.src = '/winamp-skin.jpg'
   }, [])
 
   if (loading) return <div className="skin-msg">🦞 Loading…</div>
@@ -207,9 +289,11 @@ export default function App() {
   })
 
   return (
+    <>
+    <MatrixRain/>
     <div className="skin-wrap">
       {/* ── Base image ── */}
-      <img src="/winamp-skin.jpg" className="skin-img" alt="Winamp skin"/>
+      <img src={skinUrl} className="skin-img" alt="Winamp skin"/>
 
       {/* ════════════════════════════════════════════════════════
           CENTER BLACK SCREEN — Lobster + identity
@@ -318,5 +402,6 @@ export default function App() {
         {char.prestige > 0 && <div className="fa-prestige">★ Prestige {char.prestige}</div>}
       </div>
     </div>
+    </>
   )
 }

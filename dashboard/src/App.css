@@ -2,7 +2,7 @@
 
 body {
   display: block;   /* override Vite index.css which sets display:flex */
-  background: #ffffff;
+  background: #000000;
   min-height: 100vh;
   padding: 20px;
   box-sizing: border-box;
@@ -19,7 +19,7 @@ body {
   width: 100%;
   max-width: 1100px;
   margin: 0 auto;
-  /* No aspect-ratio — the in-flow image determines height */
+  z-index: 1;   /* sit above the matrix rain canvas (z-index: 0) */
 }
 
 .skin-img {
