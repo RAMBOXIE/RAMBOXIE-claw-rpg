@@ -302,11 +302,10 @@ export default function App() {
         </div>
         <div className="panel-rule"/>
 
-        {/* ── CLASS FEATURES (2-col grid) ── */}
-        <div className="rp-feats-label">CLASS FEATURES</div>
+        {/* ── CLASS FEATURES (2-col grid, no label) ── */}
         <div className="rp-feats">
           {(char.abilities || []).map((a: string, i: number) => (
-            <div key={i} className="rp-feat-item">· {a}</div>
+            <div key={i} className="rp-feat-item">{a}</div>
           ))}
         </div>
         </div>
