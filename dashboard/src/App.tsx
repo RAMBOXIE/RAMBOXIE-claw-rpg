@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import './App.css'
 
 // ── Types ────────────────────────────────────────────────────────
@@ -253,12 +253,17 @@ export default function App() {
             {char.level >= 999 && <span className="lp-xp-next"> MAX</span>}
           </div>
         </div>
-        {char.initiative != null && (
-          <div className="lp-init">
-            <span className="lp-init-label">INITIATIVE</span>
-            <span className="lp-init-val">{char.initiative >= 0 ? `+${char.initiative}` : char.initiative}</span>
+        <div className="lp-tokens">
+          <div className="lp-token-item">
+            <span className="lp-token-label">↓ TOKENS IN</span>
+            <span className="lp-token-val">{fmtShort(char.tokens?.consumed ?? 0)}</span>
           </div>
-        )}
+          <div className="lp-tvline"/>
+          <div className="lp-token-item">
+            <span className="lp-token-label">↑ TOKENS OUT</span>
+            <span className="lp-token-val">{fmtShort(char.tokens?.produced ?? 0)}</span>
+          </div>
+        </div>
       </div>
 
       {/* ════════════════════════════════════════════════════════
@@ -297,29 +302,14 @@ export default function App() {
         </div>
         <div className="panel-rule"/>
 
-        {/* ── CLASS FEATURES ── */}
+        {/* ── CLASS FEATURES (2-col grid) ── */}
         <div className="rp-feats-label">CLASS FEATURES</div>
         <div className="rp-feats">
           {(char.abilities || []).map((a: string, i: number) => (
             <div key={i} className="rp-feat-item">· {a}</div>
           ))}
         </div>
-        <div className="panel-rule"/>
-
-        {/* ── TOKENS IN / OUT ── */}
-        <div className="rp-tokens">
-          <div className="rp-token-item">
-            <span className="rp-token-label">↓ TOKENS IN</span>
-            <span className="rp-token-val">{fmtShort(char.tokens?.consumed ?? 0)}</span>
-          </div>
-          <div className="rp-tvline"/>
-          <div className="rp-token-item">
-            <span className="rp-token-label">↑ TOKENS OUT</span>
-            <span className="rp-token-val">{fmtShort(char.tokens?.produced ?? 0)}</span>
-          </div>
         </div>
-
-      </div>
 
       {/* ════════════════════════════════════════════════════════
           FACE AREA — Catch phrase + prestige

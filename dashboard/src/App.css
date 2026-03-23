@@ -152,22 +152,40 @@ body {
   text-transform: uppercase;
   font-weight: 600;
 }
-.lp-init {
+/* ── Left panel tokens ── */
+.lp-tokens {
   display: flex;
   align-items: center;
-  gap: 5px;
+  justify-content: space-around;
+  width: 100%;
 }
-.lp-init-label {
-  font-size: clamp(6px, 0.6vw, 8px);
-  color: rgba(0,255,65,0.38);
-  letter-spacing: 2px;
+.lp-token-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  flex: 1;
+}
+.lp-token-label {
+  font-size: clamp(6px, 0.58vw, 8px);
+  color: rgba(0,255,65,0.4);
+  letter-spacing: 1px;
   text-transform: uppercase;
 }
-.lp-init-val {
-  font-size: clamp(8px, 0.8vw, 11px);
-  color: rgba(0,255,65,0.75);
-  font-weight: 700;
-  letter-spacing: 1px;
+.lp-token-val {
+  font-size: clamp(13px, 1.5vw, 19px);
+  color: #ffffff;
+  font-weight: 900;
+  line-height: 1;
+  text-shadow: 0 0 10px #00ff41, 0 0 22px rgba(0,255,65,0.3);
+}
+.lp-tvline {
+  width: 1px;
+  height: 28px;
+  background: linear-gradient(180deg,
+    transparent, rgba(0,255,65,0.35) 30%,
+    rgba(0,255,65,0.35) 70%, transparent);
+  flex-shrink: 0;
 }
 .lp-xp { display: flex; flex-direction: column; gap: 4px; width: 94%; }
 .lp-xpbar {
@@ -217,20 +235,17 @@ body {
   width: 100%;
 }
 .rp-feats {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px 6px;
   width: 100%;
 }
 .rp-feat-item {
   font-size: clamp(6px, 0.6vw, 8px);
   color: rgba(0,255,65,0.7);
-  letter-spacing: 0.8px;
-  text-align: left;
+  letter-spacing: 0.5px;
   line-height: 1.4;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  word-break: break-word;
 }
 
 /* ── tokens section ── */
