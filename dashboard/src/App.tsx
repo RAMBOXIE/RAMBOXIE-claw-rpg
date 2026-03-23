@@ -22,17 +22,17 @@ interface Character {
 
 // ── Constants ────────────────────────────────────────────────────
 const CLASSES: Record<string, { en: string; icon: string; color: string }> = {
-  barbarian: { en: 'Berserker Lobster', icon: '🪓', color: '#ea580c' },
-  fighter:   { en: 'Fighter Lobster',   icon: '⚔️',  color: '#dc2626' },
-  paladin:   { en: 'Paladin Lobster',   icon: '🛡️',  color: '#d97706' },
-  ranger:    { en: 'Ranger Lobster',    icon: '🏹',  color: '#16a34a' },
-  cleric:    { en: 'Cleric Lobster',    icon: '✝️',  color: '#7c3aed' },
-  druid:     { en: 'Druid Lobster',     icon: '🌿',  color: '#15803d' },
-  monk:      { en: 'Monk Lobster',      icon: '👊',  color: '#0369a1' },
-  rogue:     { en: 'Rogue Lobster',     icon: '🗡️',  color: '#ca8a04' },
-  bard:      { en: 'Bard Lobster',      icon: '🎭',  color: '#be185d' },
-  wizard:    { en: 'Wizard Lobster',    icon: '🧙',  color: '#1d4ed8' },
-  sorcerer:  { en: 'Sorcerer Lobster',  icon: '🔮',  color: '#7e22ce' },
+  barbarian: { en: 'Claw Berserker', icon: '🪓', color: '#ea580c' },
+  fighter:   { en: 'Claw Fighter',   icon: '⚔️',  color: '#dc2626' },
+  paladin:   { en: 'Claw Paladin',   icon: '🛡️',  color: '#d97706' },
+  ranger:    { en: 'Claw Ranger',    icon: '🏹',  color: '#16a34a' },
+  cleric:    { en: 'Claw Cleric',    icon: '✝️',  color: '#7c3aed' },
+  druid:     { en: 'Claw Druid',     icon: '🌿',  color: '#15803d' },
+  monk:      { en: 'Claw Monk',      icon: '👊',  color: '#0369a1' },
+  rogue:     { en: 'Claw Rogue',     icon: '🗡️',  color: '#ca8a04' },
+  bard:      { en: 'Claw Bard',      icon: '🎭',  color: '#be185d' },
+  wizard:    { en: 'Claw Wizard',    icon: '🧙',  color: '#1d4ed8' },
+  sorcerer:  { en: 'Claw Sorcerer',  icon: '🔮',  color: '#7e22ce' },
 }
 const CATCHPHRASES: Record<string, string> = {
   barbarian:'Rage first. Think later.',
@@ -63,8 +63,9 @@ function levelProgress(xp: number, level: number) {
 function xpToNext(xp: number, level: number) {
   return level >= 999 ? 0 : xpForLevel(level+1)-xp
 }
-function fmtNum(n: number) { return n.toLocaleString() }
 function fmtSign(n: number) { return (n>=0?'+':'')+n }
+function fmtStat(n: number) { return n >= 10000 ? (n/1000).toFixed(1)+'k' : String(n) }
+function fmtShort(n: number) { return n >= 10000 ? Math.round(n/1000)+'K' : n >= 1000 ? (n/1000).toFixed(1)+'K' : String(n) }
 
 function deriveMBTI(stats: Stats, bab: number): string {
   return (stats.claw > stats.brain ? 'E' : 'I')
@@ -78,6 +79,52 @@ function deriveAlignment(stats: Stats): string {
   const law  = lc >= 26 ? 'Lawful'  : lc <= 18 ? 'Chaotic' : 'Neutral'
   const good = ge >= 26 ? 'Good'    : ge <= 18 ? 'Evil'    : 'Neutral'
   return (law === 'Neutral' && good === 'Neutral') ? 'True Neutral' : `${law} ${good}`
+}
+
+// ── Pixel Icons ──────────────────────────────────────────────────
+type PxMap = Array<[number,number]>
+const PIXEL_HEART: PxMap = [
+  [1,0],[2,0],[4,0],[5,0],
+  [0,1],[1,1],[2,1],[3,1],[4,1],[5,1],[6,1],
+  [0,2],[1,2],[2,2],[3,2],[4,2],[5,2],[6,2],
+  [1,3],[2,3],[3,3],[4,3],[5,3],
+  [2,4],[3,4],[4,4],
+  [3,5],
+]
+const PIXEL_SHIELD: PxMap = [
+  [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],
+  [0,1],[6,1],
+  [0,2],[6,2],
+  [1,3],[2,3],[3,3],[4,3],[5,3],
+  [2,4],[3,4],[4,4],
+  [3,5],
+]
+const PIXEL_SWORD: PxMap = [
+  [3,0],
+  [3,1],[3,2],[3,3],[3,4],
+  [0,5],[1,5],[2,5],[3,5],[4,5],[5,5],[6,5],
+  [3,6],[3,7],
+]
+const PIXEL_CHAT: PxMap = [
+  [1,0],[2,0],[3,0],[4,0],[5,0],[6,0],
+  [0,1],[7,1],
+  [0,2],[7,2],
+  [0,3],[7,3],
+  [1,4],[2,4],[3,4],[4,4],[5,4],[6,4],
+  [2,5],
+  [1,6],
+]
+
+function PixelIcon({ pixels, color, size=14 }: { pixels: PxMap; color: string; size?: number }) {
+  const px = size / 8
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}
+      style={{ imageRendering:'pixelated', display:'inline-block', verticalAlign:'middle', flexShrink:0 }}>
+      {pixels.map(([col,row],i)=>(
+        <rect key={i} x={col*px} y={row*px} width={px} height={px} fill={color}/>
+      ))}
+    </svg>
+  )
 }
 
 // ── Pixel Lobster ────────────────────────────────────────────────
@@ -109,13 +156,17 @@ function LobsterSprite({ classColor, size=160 }: { classColor: string; size?: nu
       style={{ imageRendering:'pixelated', display:'block', margin:'0 auto' }}>
       <defs>
         <filter id="lg2" x="-30%" y="-30%" width="160%" height="160%">
-          <feGaussianBlur stdDeviation="2" result="blur"/>
+          <feGaussianBlur result="blur">
+            <animate attributeName="stdDeviation" values="2;4.5;2" dur="2.4s" repeatCount="indefinite"/>
+          </feGaussianBlur>
           <feFlood floodColor={classColor} floodOpacity="0.6" result="c"/>
           <feComposite in="c" in2="blur" operator="in" result="g"/>
           <feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
       </defs>
       <g filter="url(#lg2)">
+        <animateTransform attributeName="transform" type="translate"
+          values="0,0; 0,-3; 0,0" dur="2.4s" repeatCount="indefinite" additive="sum"/>
         {LOBSTER_PIXELS.map(([col,row,type],i)=>(
           <rect key={i} x={col*px} y={row*px} width={px} height={px}
             fill={cm[type]??classColor} opacity={om[type]??1}/>
@@ -158,10 +209,10 @@ export default function App() {
   const saves        = char.saves ?? { fort:0, ref:0, will:0 }
 
   // ── Coordinate map (percentages of 1280×960 image) ─────────────
-  // Black screen : x=500, y=155, w=290, h=250
-  // Left  panel  : x=160, y=330, w=370, h=150
-  // Right panel  : x=760, y=330, w=370, h=150
-  // Face area    : x=480, y=490, w=320, h=310
+  // Black screen : x=490, y=85,  w=300, h=285  (center screen, no panel overlap)
+  // Left  panel  : x=185, y=195, w=270, h=165  (flat green wing, after speakers ~x=175, before head ~x=470)
+  // Right panel  : x=825, y=195, w=270, h=165  (flat green wing, after head ~x=790, before speakers ~x=1110)
+  // Face area    : x=450, y=385, w=380, h=290  (chin/face below screen)
   const pct = (x: number, y: number, w: number, h: number) => ({
     position: 'absolute' as const,
     left:   `${(x/1280*100).toFixed(3)}%`,
@@ -178,15 +229,16 @@ export default function App() {
       {/* ════════════════════════════════════════════════════════
           CENTER BLACK SCREEN — Lobster + identity
           ════════════════════════════════════════════════════════ */}
-      <div className="skin-screen" style={pct(500,155,290,250)}>
+      <div className="skin-screen" style={pct(495,204,299,213)}>
         <div className="screen-scanlines"/>
         <div className="screen-inner">
-          <LobsterSprite classColor={lobsterColor} size={130}/>
+          <LobsterSprite classColor={lobsterColor} size={100}/>
           <div className="screen-id">
             <span className="sc-mbti">{mbti}</span>
             <span className="sc-dot"> · </span>
             <span className="sc-align">{alignment}</span>
           </div>
+          <div className="screen-phrase">"{phrase}"</div>
         </div>
       </div>
 
@@ -194,40 +246,55 @@ export default function App() {
           LEFT GREEN PANEL — Name · Level · Class
           Most viral: who is this character?
           ════════════════════════════════════════════════════════ */}
-      <div className="skin-panel skin-left" style={pct(164,330,365,150)}>
+      <div className="skin-panel skin-left" style={pct(175,242,286,226)}>
         <div className="lp-name">{char.name}</div>
-        <div className="lp-row">
-          <span className="lp-lv">Lv.{char.level}</span>
-          <span className="lp-cls">{cls.icon} {cls.en}</span>
+        <div className="panel-rule"/>
+        <div className="lp-core">
+          <div className="lp-lv">Lv.{char.level}</div>
+          <div className="lp-cls-row">
+            <span className="lp-cls-icon">{cls.icon}</span>
+            <span className="lp-cls">{cls.en}</span>
+          </div>
         </div>
-        <div className="lp-title">{title}</div>
+        <div className="panel-rule"/>
         <div className="lp-xp">
           <div className="lp-xpbar">
             <div className="lp-xpfill" style={{width:`${progress}%`}}/>
           </div>
-          <div className="lp-xplabel">{fmtNum(char.xp)} XP · {char.level<999?`${fmtNum(toNext)} to Lv.${char.level+1}`:'MAX'}</div>
+          <div className="lp-xplabel">
+            <span className="lp-xp-cur">{fmtShort(char.xp)} XP</span>
+            {char.level < 999 && <span className="lp-xp-sep"> · </span>}
+            {char.level < 999 && <span className="lp-xp-next">{fmtShort(toNext)} to Lv.{char.level+1}</span>}
+            {char.level >= 999 && <span className="lp-xp-next"> MAX</span>}
+          </div>
         </div>
+        <div className="lp-title"><span className="lp-rank-prefix">RANK · </span>{title}</div>
       </div>
 
       {/* ════════════════════════════════════════════════════════
           RIGHT GREEN PANEL — Combat stats
           Most viral: HP / AC / BAB + saves
           ════════════════════════════════════════════════════════ */}
-      <div className="skin-panel skin-right" style={pct(755,330,365,150)}>
-        <div className="rp-stats">
-          <div className="rp-stat">
-            <span className="rp-v">{char.hp ?? '—'}</span>
-            <span className="rp-l">HP</span>
+      <div className="skin-panel skin-right" style={pct(835,240,290,232)}>
+        <div className="rp-section-label">COMBAT</div>
+        <div className="rp-combat">
+          <div className="rp-cstat">
+            <span className="rp-cl"><PixelIcon pixels={PIXEL_HEART} color="#ff4466" size={10}/> HP</span>
+            <span className="rp-cv">{char.hp != null ? fmtStat(char.hp) : '—'}</span>
           </div>
-          <div className="rp-stat">
-            <span className="rp-v">{char.ac ?? '—'}</span>
-            <span className="rp-l">AC</span>
+          <div className="rp-vline"/>
+          <div className="rp-cstat">
+            <span className="rp-cl"><PixelIcon pixels={PIXEL_SHIELD} color="#44aaff" size={10}/> AC</span>
+            <span className="rp-cv">{char.ac ?? '—'}</span>
           </div>
-          <div className="rp-stat">
-            <span className="rp-v">{char.bab != null ? fmtSign(char.bab) : '—'}</span>
-            <span className="rp-l">BAB</span>
+          <div className="rp-vline"/>
+          <div className="rp-cstat">
+            <span className="rp-cl"><PixelIcon pixels={PIXEL_SWORD} color="#ffdd44" size={10}/> BAB</span>
+            <span className="rp-cv">{char.bab != null ? fmtSign(char.bab) : '—'}</span>
           </div>
         </div>
+        <div className="panel-rule"/>
+        <div className="rp-section-label">SAVING THROWS</div>
         <div className="rp-saves">
           {([['FORT',saves.fort??0],['REF',saves.ref??0],['WILL',saves.will??0]] as [string,number][]).map(([l,v])=>(
             <div key={l} className="rp-save">
@@ -236,16 +303,18 @@ export default function App() {
             </div>
           ))}
         </div>
-        <div className="rp-convs">⚡ {char.conversations ?? 0} conversations</div>
+        <div className="panel-rule"/>
+        <div className="rp-footer">
+          <PixelIcon pixels={PIXEL_CHAT} color="#44ff88" size={10}/>
+          <span>{char.conversations ?? 0} MESSAGES</span>
+        </div>
       </div>
 
       {/* ════════════════════════════════════════════════════════
           FACE AREA — Catch phrase + prestige
           ════════════════════════════════════════════════════════ */}
-      <div className="skin-face" style={pct(480,490,320,310)}>
-        <div className="fa-phrase">"{phrase}"</div>
+      <div className="skin-face" style={pct(450,385,380,290)}>
         {char.prestige > 0 && <div className="fa-prestige">★ Prestige {char.prestige}</div>}
-        <div className="fa-updated">{char.updatedAt?.slice(11,16)}</div>
       </div>
     </div>
   )
