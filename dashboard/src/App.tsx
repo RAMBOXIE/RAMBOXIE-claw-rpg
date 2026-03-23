@@ -293,19 +293,20 @@ export default function App() {
 
         {/* ── FORT / REF / WILL ── */}
         <div className="rp-saves">
-          {([['FORT', saves.fort??0],['REF', saves.ref??0],['WILL', saves.will??0]] as [string,number][]).map(([l,v])=>(
+          {([['♦','FORT',saves.fort??0],['⚡','REF',saves.ref??0],['★','WILL',saves.will??0]] as [string,string,number][]).map(([icon,l,v])=>(
             <div key={l} className="rp-save">
-              <span className="rp-sl">{l}</span>
+              <span className="rp-sl"><span className="rp-si">{icon}</span>{l}</span>
               <span className="rp-sv">{v}</span>
             </div>
           ))}
         </div>
-        <div className="panel-rule"/>
 
-        {/* ── CLASS FEATURES (2-col grid, no label) ── */}
+        {/* ── CLASS FEATURES (2-col grid, pushed to bottom) ── */}
         <div className="rp-feats">
           {(char.abilities || []).map((a: string, i: number) => (
-            <div key={i} className="rp-feat-item">{a}</div>
+            <div key={i} className="rp-feat-item">
+              <span className="rp-fi">{['⚔','🗡','🛡','✦'][i] ?? '✦'}</span>{a}
+            </div>
           ))}
         </div>
         </div>
