@@ -3,10 +3,22 @@ import cors from 'cors';
 import { readFileSync, existsSync, watch } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { networkInterfaces } from 'os';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const ROOT = join(__dirname, '..');
-const CHARACTER_FILE = join(ROOT, 'character.json');
+
+// Resolve character.json the same way _paths.mjs does:
+// workspace/claw-rpg/character.json  (survives skill reinstalls)
+function findWorkspace() {
+  const candidates = [
+    join(process.env.USERPROFILE || '', '.openclaw', 'workspace'),
+    join(process.env.HOME        || '', '.openclaw', 'workspace'),
+  ];
+  for (const p of candidates) if (existsSync(p)) return p;
+  return candidates[0];
+}
+const WORKSPACE      = process.env.OPENCLAW_WORKSPACE || findWorkspace();
+const CHARACTER_FILE = join(WORKSPACE, 'claw-rpg', 'character.json');
 const app = express();
 
 app.use(cors());
@@ -87,8 +99,22 @@ app.get('/{*path}', (_req, res) => {
   res.send('<pre>Run: npm run build\nThen: npm start</pre>');
 });
 
+// Detect LAN IP dynamically at startup
+function getLanIp() {
+  try {
+    for (const iface of Object.values(networkInterfaces())) {
+      for (const addr of iface) {
+        if (addr.family === 'IPv4' && !addr.internal) return addr.address;
+      }
+    }
+  } catch {}
+  return 'localhost';
+}
+
 const PORT = process.env.PORT || 3500;
 app.listen(PORT, '0.0.0.0', () => {
+  const lanIp = getLanIp();
   console.log(`\n🦞 Claw RPG Dashboard → http://localhost:${PORT}`);
-  console.log(`   LAN access       → http://192.168.0.145:${PORT}\n`);
+  console.log(`   LAN access       → http://${lanIp}:${PORT}`);
+  console.log(`   Character file   → ${CHARACTER_FILE}\n`);
 });
