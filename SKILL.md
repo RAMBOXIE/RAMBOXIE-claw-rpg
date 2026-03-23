@@ -17,7 +17,7 @@ node scripts/init.mjs
 node scripts/sheet.mjs
 
 # 3. Launch the web dashboard
-cd dashboard && npm start     # http://localhost:3500
+cd dashboard && npm install && npm start     # http://localhost:3500
 ```
 
 ## Hidden Easter Egg Trigger (Recommended)
