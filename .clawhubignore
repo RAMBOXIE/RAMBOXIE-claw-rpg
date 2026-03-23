@@ -1,20 +1,3 @@
-# Personal agent files
-SOUL.md
-AGENTS.md
-USER.md
-MEMORY.md
-memory/
-
-# Runtime data
-character.json
-arena-history.json
-config.json
-
-# Build artifacts
+﻿dashboard/package-lock.json
 dashboard/node_modules/
-dashboard/dist/
-node_modules/
-*.skill
-
-# Dev
-.git/
+assets/dashboard-preview.png
