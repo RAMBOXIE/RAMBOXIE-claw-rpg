@@ -5,10 +5,8 @@
 body {
   background: #ffffff;
   min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   padding: 20px;
+  box-sizing: border-box;
   font-family: 'Press Start 2P', monospace;
 }
 
@@ -22,6 +20,7 @@ body {
   width: 100%;
   max-width: 1100px;
   aspect-ratio: 1280 / 960;
+  margin: 0 auto;
 }
 
 .skin-img {
