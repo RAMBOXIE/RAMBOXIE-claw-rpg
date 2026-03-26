@@ -118,38 +118,27 @@ function buildGreeting(char) {
   const statsPanel = allStatsPanel(char.stats);
 
   const hour = new Date().getHours();
-  const timeLabel = lang === 'zh'
-    ? (hour < 6 ? '深夜报' : hour < 12 ? '晨报' : hour < 18 ? '午报' : '晚报')
-    : (hour < 6 ? 'Late Night' : hour < 12 ? 'Morning' : hour < 18 ? 'Afternoon' : 'Evening');
   const closing = lang === 'zh'
-    ? (hour < 6 ? '夜深了，注意休息。' : hour < 12 ? '今日请多指教。' : hour < 18 ? '下午加油。' : '辛苦了，晚上好。')
-    : (hour < 6 ? 'Rest well.' : hour < 12 ? "At your service. Let's make today count." : hour < 18 ? 'Good afternoon. Keep it up.' : 'Good evening. Well done today.');
+    ? (hour < 6  ? '……夜深了，連暗影龍都睡了。你還不睡？'
+     : hour < 12 ? '晨光初照，利爪已磨。今日請多指教。'
+     : hour < 18 ? '日頭正烈，征途未歇。繼續前進。'
+     :             '暮色降臨，篝火已燃。辛苦了，冒險者。')
+    : (hour < 6  ? '…The shadow dragon sleeps. Perhaps you should too.'
+     : hour < 12 ? "Dawn breaks, claws sharpened. Let's make today count."
+     : hour < 18 ? 'The sun burns high. The quest continues.'
+     :             'Dusk falls, campfire lit. Well fought today, adventurer.');
 
-  if (lang === 'zh') {
-    return [
-      `🦞 ────── ${timeLabel} ──────`,
-      ``,
-      intro,
-      ``,
-      statsPanel,
-      ``,
-      xp,
-      ``,
-      closing,
-    ].join('\n');
-  } else {
-    return [
-      `🦞 ─── ${timeLabel} Check-in ───`,
-      ``,
-      intro,
-      ``,
-      statsPanel,
-      ``,
-      xp,
-      ``,
-      closing,
-    ].join('\n');
-  }
+  return [
+    `🦞 ──────────────────`,
+    ``,
+    intro,
+    ``,
+    statsPanel,
+    ``,
+    xp,
+    ``,
+    closing,
+  ].join('\n');
 }
 
 // ── 主流程 ────────────────────────────────────────────────────

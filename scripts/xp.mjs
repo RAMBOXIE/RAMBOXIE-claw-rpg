@@ -23,7 +23,11 @@ import {
   calcXpGain, levelForXp, xpToNextLevel, detectClass,
   getAbilities, shouldReclassify, CLASSES, levelProgress, STAT_NAMES
 } from './_formulas.mjs';
-import { notify, msgLevelUp, msgClassChange, msgMaxLevel, msgStatUp } from './_notify.mjs';
+import {
+  notify, msgLevelUp, msgClassChange, msgMaxLevel, msgStatUp,
+  msgBigQuest, msgSpeedClear, msgReturn, msgStreak,
+  msgXpMilestone, msgConvMilestone, msgNightOwl, msgSilentOutput,
+} from './_notify.mjs';
 
 const args = process.argv.slice(2);
 const get  = f => { const i = args.indexOf(f); return i !== -1 ? parseFloat(args[i+1]) || 0 : 0; };
@@ -101,6 +105,63 @@ async function run({ consumed = 0, produced = 0, bonusXp = 0, conversations = 0,
     classChanged   = true;
   }
 
+  // ── 事件检测（写盘前收集，写盘后推送）──────────────────────
+  const events = [];
+  const now    = new Date();
+  const today  = now.toISOString().slice(0, 10);
+  const hour   = now.getHours();
+
+  // 1. 长期回归
+  if (char.lastActiveDate && char.lastActiveDate !== today) {
+    const last   = new Date(char.lastActiveDate + 'T00:00:00');
+    const diffMs = now - last;
+    const diffD  = Math.floor(diffMs / 86400000);
+    if (diffD >= 2) events.push({ type: 'return', days: diffD });
+  }
+
+  // 2. 连续在线 streak
+  const yesterday = new Date(now);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yStr = yesterday.toISOString().slice(0, 10);
+  if (!char.streak) char.streak = 0;
+  if (!char.lastStreakDate) char.lastStreakDate = '';
+  if (char.lastStreakDate === today) {
+    // already counted today
+  } else if (char.lastStreakDate === yStr) {
+    char.streak += 1;
+    char.lastStreakDate = today;
+    if ([3, 7, 14, 30].includes(char.streak)) events.push({ type: 'streak', streak: char.streak });
+  } else {
+    char.streak = 1;
+    char.lastStreakDate = today;
+  }
+
+  // update lastActiveDate
+  char.lastActiveDate = today;
+
+  // 3. 大副本完成
+  if (consumed > 5000 || produced > 2500) events.push({ type: 'bigQuest', gained });
+
+  // 4. 速通
+  if (consumed > 3000 && conversations <= 5 && conversations > 0) events.push({ type: 'speedClear', gained });
+
+  // 5. XP 里程碑
+  for (const m of [10000, 50000, 100000, 500000]) {
+    if (oldXp < m && char.xp >= m) events.push({ type: 'xpMilestone', milestone: m });
+  }
+
+  // 6. 对话数里程碑
+  const oldConv = char.conversations - conversations;
+  for (const m of [100, 500, 1000, 5000]) {
+    if (oldConv < m && char.conversations >= m) events.push({ type: 'convMilestone', milestone: m });
+  }
+
+  // 7. 深夜勇士 (23:00-05:59 && delta > 200)
+  if ((hour >= 23 || hour < 6) && gained > 200) events.push({ type: 'nightOwl' });
+
+  // 8. 单向巨输出
+  if (produced > 3000 && consumed < 500) events.push({ type: 'silentOutput' });
+
   char.updatedAt = new Date().toISOString();
   writeFileSync(CHARACTER_FILE, JSON.stringify(char, null, 2), 'utf8');
 
@@ -150,6 +211,11 @@ async function run({ consumed = 0, produced = 0, bonusXp = 0, conversations = 0,
     lines.push(`\n   🔄 职业转变！${oldCls.zh} → ${newCls.zh}`);
   }
 
+  // 事件触发摘要
+  if (events.length) {
+    lines.push(`\n   📢 触发事件：${events.map(e => e.type).join(', ')}`);
+  }
+
   lines.push('');
   console.log(lines.join('\n'));
 
@@ -166,9 +232,23 @@ async function run({ consumed = 0, produced = 0, bonusXp = 0, conversations = 0,
   for (const sc of statChanges) {
     notifications.push(notify(msgStatUp(char, sc.stat, sc.old, sc.new)));
   }
+
+  // 事件驱动通知
+  for (const evt of events) {
+    switch (evt.type) {
+      case 'bigQuest':      notifications.push(notify(msgBigQuest(char, evt.gained))); break;
+      case 'speedClear':    notifications.push(notify(msgSpeedClear(char, evt.gained))); break;
+      case 'return':        notifications.push(notify(msgReturn(char, evt.days))); break;
+      case 'streak':        notifications.push(notify(msgStreak(char, evt.streak))); break;
+      case 'xpMilestone':   notifications.push(notify(msgXpMilestone(char, evt.milestone))); break;
+      case 'convMilestone': notifications.push(notify(msgConvMilestone(char, evt.milestone))); break;
+      case 'nightOwl':      notifications.push(notify(msgNightOwl(char))); break;
+      case 'silentOutput':  notifications.push(notify(msgSilentOutput(char))); break;
+    }
+  }
   if (notifications.length) await Promise.allSettled(notifications);
 
-  const result = { gained, xp: char.xp, level: char.level, leveled, classChanged, statChanges, progress };
+  const result = { gained, xp: char.xp, level: char.level, leveled, classChanged, statChanges, progress, events };
   process.stdout.write('\n__JSON_OUTPUT__\n' + JSON.stringify(result) + '\n');
   return result;
 }
