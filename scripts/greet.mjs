@@ -117,9 +117,17 @@ function buildGreeting(char) {
 
   const statsPanel = allStatsPanel(char.stats);
 
+  const hour = new Date().getHours();
+  const timeLabel = lang === 'zh'
+    ? (hour < 6 ? '深夜报' : hour < 12 ? '晨报' : hour < 18 ? '午报' : '晚报')
+    : (hour < 6 ? 'Late Night' : hour < 12 ? 'Morning' : hour < 18 ? 'Afternoon' : 'Evening');
+  const closing = lang === 'zh'
+    ? (hour < 6 ? '夜深了，注意休息。' : hour < 12 ? '今日请多指教。' : hour < 18 ? '下午加油。' : '辛苦了，晚上好。')
+    : (hour < 6 ? 'Rest well.' : hour < 12 ? "At your service. Let's make today count." : hour < 18 ? 'Good afternoon. Keep it up.' : 'Good evening. Well done today.');
+
   if (lang === 'zh') {
     return [
-      `🦞 ────── 晨报 ──────`,
+      `🦞 ────── ${timeLabel} ──────`,
       ``,
       intro,
       ``,
@@ -127,11 +135,11 @@ function buildGreeting(char) {
       ``,
       xp,
       ``,
-      `今日请多指教。`,
+      closing,
     ].join('\n');
   } else {
     return [
-      `🦞 ─── Daily Check-in ───`,
+      `🦞 ─── ${timeLabel} Check-in ───`,
       ``,
       intro,
       ``,
@@ -139,7 +147,7 @@ function buildGreeting(char) {
       ``,
       xp,
       ``,
-      `At your service. Let's make today count.`,
+      closing,
     ].join('\n');
   }
 }
