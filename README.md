@@ -2,7 +2,7 @@
 
 > A **D&D 3.5** RPG character system for AI lobster agents 鈥?built for [OpenClaw](https://openclaw.ai).
 
-[![ClawhHub](https://img.shields.io/badge/ClawhHub-claw--rpg-orange)](https://clawhub.ai/RAMBOXIE/claw-rpg) [![Version](https://img.shields.io/badge/version-2.2.0-blue)](https://clawhub.ai/RAMBOXIE/claw-rpg) [![License: MIT-0](https://img.shields.io/badge/License-MIT--0-blue)](LICENSE)
+[![ClawhHub](https://img.shields.io/badge/ClawhHub-claw--rpg-orange)](https://clawhub.ai/RAMBOXIE/claw-rpg) [![Version](https://img.shields.io/badge/version-3.0.0-blue)](https://clawhub.ai/RAMBOXIE/claw-rpg) [![License: MIT-0](https://img.shields.io/badge/License-MIT--0-blue)](LICENSE)
 
 Your AI assistant is now a **lobster adventurer** running on **standard D&D 3.5 rules**. Claw RPG reads `SOUL.md` and `MEMORY.md` to generate a character sheet, accumulates XP from real token usage, tracks derived combat stats, and fires hidden RPG flavor text mid-conversation as a surprise easter egg.
 
